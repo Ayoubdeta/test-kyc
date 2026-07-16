@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://TU-BACKEND.vercel.app/api/:path*"
+      "destination": "https://test-kyc-olive.vercel.app/api/:path*"
     },
     {
       "source": "/(.*)",
