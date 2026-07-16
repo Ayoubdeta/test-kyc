@@ -9,6 +9,7 @@ import { updateProfileSchema } from '../validators/profile.validators';
 import {
   adminUpdateUserSchema,
   createClientSchema,
+  languageSchema,
   resetPasswordSchema,
 } from '../validators/user.validators';
 
@@ -27,6 +28,15 @@ router.patch(
   express.json({ limit: '2mb' }),
   validateBody(updateProfileSchema),
   asyncHandler(userController.updateProfile),
+);
+
+// Preferencia de idioma (i18n): cuerpo pequeño; disponible aunque el perfil
+// no esté completo (por eso es un endpoint aparte de /me/profile).
+router.patch(
+  '/me/language',
+  express.json({ limit: '1kb' }),
+  validateBody(languageSchema),
+  asyncHandler(userController.setLanguage),
 );
 
 // ─── Administración de usuarios (solo admin) ───────────────────

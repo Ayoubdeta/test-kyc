@@ -8,6 +8,7 @@ import type { UpdateProfileInput } from '../validators/profile.validators';
 import type {
   AdminUpdateUserInput,
   CreateClientInput,
+  LanguageInput,
   ResetPasswordInput,
 } from '../validators/user.validators';
 
@@ -30,6 +31,16 @@ export const userController = {
     const input = req.body as UpdateProfileInput;
     const profile = await userService.updateProfile(req.user.sub, input);
     res.status(200).json({ profile });
+  },
+
+  /** Guarda la preferencia de idioma del usuario autenticado (i18n). */
+  async setLanguage(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw AppError.unauthorized('No autenticado');
+    }
+    const { language } = req.body as LanguageInput;
+    await userService.setLanguage(req.user.sub, language);
+    res.status(200).json({ language });
   },
 
   /** Lista de usuarios (solo admin). */

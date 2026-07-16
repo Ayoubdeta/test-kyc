@@ -6,6 +6,7 @@ import type {
   DocumentEventType,
   DocumentStatus,
   DocumentTypeKey,
+  Language,
   LogAction,
   NotificationType,
   Role,
@@ -41,6 +42,7 @@ export interface ProfileRow {
   birth_date: Date | null;
   bio: string | null;
   avatar_url: string | null;
+  language: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -248,6 +250,7 @@ export interface PublicProfile {
   birthDate: string | null;
   bio: string | null;
   avatarUrl: string | null;
+  language: Language;
 }
 
 /** Respuesta combinada usuario + perfil para el dashboard. */

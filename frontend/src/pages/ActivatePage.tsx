@@ -6,24 +6,26 @@ import { getApiErrorMessage } from '../api/client';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { TextField } from '../components/ui/TextField';
+import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { AuthLayout } from '../layouts/AuthLayout';
 
 type FieldErrors = Partial<Record<'password' | 'confirmPassword' | 'accept', string>>;
 
-function validatePassword(pw: string): string | null {
-  if (pw.length < 8) return 'Mínimo 8 caracteres';
-  if (!/[a-z]/.test(pw)) return 'Incluye una minúscula';
-  if (!/[A-Z]/.test(pw)) return 'Incluye una mayúscula';
-  if (!/[0-9]/.test(pw)) return 'Incluye un número';
-  return null;
-}
-
 export function ActivatePage() {
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';
   const { activate } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
+
+  const validatePassword = (pw: string): string | null => {
+    if (pw.length < 8) return t('activate.pwMin');
+    if (!/[a-z]/.test(pw)) return t('activate.pwLower');
+    if (!/[A-Z]/.test(pw)) return t('activate.pwUpper');
+    if (!/[0-9]/.test(pw)) return t('activate.pwDigit');
+    return null;
+  };
 
   const [values, setValues] = useState({ password: '', confirmPassword: '' });
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
@@ -52,10 +54,10 @@ export function ActivatePage() {
     const pwError = validatePassword(values.password);
     if (pwError) errors.password = pwError;
     if (values.confirmPassword !== values.password) {
-      errors.confirmPassword = 'Las contraseñas no coinciden';
+      errors.confirmPassword = t('activate.mismatch');
     }
     if (!acceptPrivacy || !acceptTerms) {
-      errors.accept = 'Debes aceptar la Política de Privacidad y los Términos y Condiciones';
+      errors.accept = t('activate.acceptError');
     }
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -68,7 +70,7 @@ export function ActivatePage() {
       await activate({ token, password: values.password, acceptPrivacy, acceptTerms });
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      setFormError(getApiErrorMessage(err, 'No se pudo activar la cuenta'));
+      setFormError(getApiErrorMessage(err, t('activate.error')));
     } finally {
       setSubmitting(false);
     }
@@ -76,9 +78,9 @@ export function ActivatePage() {
 
   const loginFooter = (
     <span className="text-slate-500">
-      ¿Ya tienes acceso?{' '}
+      {t('activate.footer')}
       <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-700">
-        Inicia sesión
+        {t('activate.footerLink')}
       </Link>
     </span>
   );
@@ -87,26 +89,22 @@ export function ActivatePage() {
   if (!token || info.isError) {
     return (
       <AuthLayout
-        title="Enlace no válido"
-        subtitle="No hemos podido validar tu invitación"
+        title={t('activate.invalidTitle')}
+        subtitle={t('activate.invalidSubtitle')}
         footer={loginFooter}
       >
-        <Alert>
-          {!token
-            ? 'Falta el token de activación en el enlace.'
-            : 'El enlace de activación no es válido o ha caducado. Pide a tu gestor de Decal uno nuevo.'}
-        </Alert>
+        <Alert>{!token ? t('activate.missingToken') : t('activate.invalidToken')}</Alert>
       </AuthLayout>
     );
   }
 
   return (
     <AuthLayout
-      title="Activa tu cuenta"
+      title={t('activate.title')}
       subtitle={
         info.data
-          ? `Bienvenido, ${info.data.razonSocial}. Crea tu contraseña para acceder.`
-          : 'Crea tu contraseña para acceder'
+          ? t('activate.welcome', { name: info.data.razonSocial })
+          : t('activate.subtitle')
       }
       footer={loginFooter}
     >
@@ -115,12 +113,13 @@ export function ActivatePage() {
 
         {info.data && (
           <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
-            Cuenta: <span className="font-medium text-slate-800">{info.data.email}</span>
+            {t('activate.account')}{' '}
+            <span className="font-medium text-slate-800">{info.data.email}</span>
           </p>
         )}
 
         <TextField
-          label="Contraseña"
+          label={t('activate.password')}
           name="password"
           type="password"
           autoComplete="new-password"
@@ -129,7 +128,7 @@ export function ActivatePage() {
           error={fieldErrors.password}
         />
         <TextField
-          label="Confirmar contraseña"
+          label={t('activate.confirmPassword')}
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
@@ -145,7 +144,7 @@ export function ActivatePage() {
             onChange={(e) => setAcceptPrivacy(e.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
           />
-          <span>Acepto la Política de Privacidad</span>
+          <span>{t('activate.acceptPrivacy')}</span>
         </label>
         <label className="flex items-start gap-2.5 text-sm text-slate-600">
           <input
@@ -154,12 +153,12 @@ export function ActivatePage() {
             onChange={(e) => setAcceptTerms(e.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
           />
-          <span>Acepto los Términos y Condiciones</span>
+          <span>{t('activate.acceptTerms')}</span>
         </label>
         {fieldErrors.accept && <p className="-mt-2 text-sm text-red-600">{fieldErrors.accept}</p>}
 
         <Button type="submit" isLoading={submitting} className="mt-2 w-full">
-          Activar cuenta
+          {t('activate.submit')}
         </Button>
       </form>
     </AuthLayout>

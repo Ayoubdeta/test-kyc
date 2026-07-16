@@ -91,6 +91,7 @@ export interface PublicProfile {
   birthDate: string | null;
   bio: string | null;
   avatarUrl: string | null;
+  language: string;
 }
 
 export interface MeResponse {

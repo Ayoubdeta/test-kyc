@@ -279,6 +279,11 @@ export const userRepository = {
     await query(`UPDATE users SET password_hash = $2 WHERE id = $1`, [id, passwordHash]);
   },
 
+  /** Guarda la preferencia de idioma (i18n) en el perfil del usuario. */
+  async updateLanguage(userId: string, language: string): Promise<void> {
+    await query(`UPDATE profiles SET language = $2 WHERE user_id = $1`, [userId, language]);
+  },
+
   async deleteById(id: string): Promise<void> {
     await query(`DELETE FROM users WHERE id = $1`, [id]);
   },

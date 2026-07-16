@@ -148,6 +148,11 @@ export const userService = {
     return this.getMe(targetUserId);
   },
 
+  /** Guarda la preferencia de idioma del usuario autenticado (i18n). */
+  async setLanguage(userId: string, language: string): Promise<void> {
+    await userRepository.updateLanguage(userId, language);
+  },
+
   /** El admin fija una contraseña nueva y revoca las sesiones del usuario. */
   async resetPassword(targetUserId: string, newPassword: string): Promise<void> {
     const target = await userRepository.findById(targetUserId);

@@ -473,3 +473,15 @@ ALTER TABLE chat_messages
 -- Un mensaje puede ser solo-adjunto (sin texto): permitimos body vacío.
 -- (body sigue siendo NOT NULL; una cadena vacía es válida.)
 
+
+
+-- ════════════════════════════════════════════════════════════════
+--  11 · Preferencia de idioma por usuario (i18n)
+-- ════════════════════════════════════════════════════════════════
+
+ALTER TABLE profiles
+    ADD COLUMN IF NOT EXISTS language VARCHAR(5) NOT NULL DEFAULT 'es';
+
+ALTER TABLE profiles DROP CONSTRAINT IF EXISTS chk_profiles_language;
+ALTER TABLE profiles ADD CONSTRAINT chk_profiles_language
+    CHECK (language IN ('es', 'ca', 'en', 'de', 'fr', 'ar', 'zh'));

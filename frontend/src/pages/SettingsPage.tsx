@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { getApiErrorMessage } from '../api/client';
 import { userApi, type UpdateProfilePayload } from '../api/user.api';
 import { Avatar } from '../components/Avatar';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { TextArea } from '../components/ui/TextArea';
 import { TextField } from '../components/ui/TextField';
+import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { ACCEPTED_IMAGE_TYPES, fileToCompressedDataUrl } from '../lib/image';
@@ -25,6 +27,7 @@ type FieldErrors = Partial<Record<keyof FormValues, string>>;
 
 export function SettingsPage() {
   const { me } = useAuth();
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +56,7 @@ export function SettingsPage() {
       setSuccess(true);
     },
     onError: (err) => {
-      setFormError(getApiErrorMessage(err, 'No se pudieron guardar los cambios'));
+      setFormError(getApiErrorMessage(err, t('settings.saveError')));
     },
   });
 
@@ -73,7 +76,7 @@ export function SettingsPage() {
       setAvatarUrl(dataUrl);
       setSuccess(false);
     } catch (err) {
-      setAvatarError(err instanceof Error ? err.message : 'No se pudo procesar la imagen');
+      setAvatarError(err instanceof Error ? err.message : t('settings.photoError'));
     } finally {
       // Permite volver a elegir el mismo archivo si hace falta.
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -112,18 +115,27 @@ export function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-1 text-xl font-bold text-slate-900">Configurar cuenta</h1>
-        <p className="mb-6 text-sm text-slate-500">
-          Actualiza tu foto de perfil y tus datos personales.
-        </p>
+        <h1 className="mb-1 text-xl font-bold text-slate-900">{t('settings.title')}</h1>
+        <p className="mb-6 text-sm text-slate-500">{t('settings.subtitle')}</p>
+
+        {/* Idioma de la interfaz (se guarda en la cuenta) */}
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-base font-semibold text-slate-800">
+            {t('settings.languageTitle')}
+          </h2>
+          <p className="mb-4 text-sm text-slate-500">{t('settings.languageHint')}</p>
+          <LanguageSwitcher />
+        </section>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
           {formError && <Alert>{formError}</Alert>}
-          {success && <Alert variant="info">Cambios guardados correctamente.</Alert>}
+          {success && <Alert variant="info">{t('settings.saved')}</Alert>}
 
           {/* Foto de perfil */}
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-base font-semibold text-slate-800">Foto de perfil</h2>
+            <h2 className="mb-4 text-base font-semibold text-slate-800">
+              {t('settings.photoTitle')}
+            </h2>
             <div className="flex items-center gap-5">
               <Avatar src={avatarUrl} name={displayName} size="lg" />
               <div className="flex flex-col gap-2">
@@ -133,15 +145,15 @@ export function SettingsPage() {
                     variant="ghost"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    {avatarUrl ? 'Cambiar foto' : 'Subir foto'}
+                    {avatarUrl ? t('settings.changePhoto') : t('settings.uploadPhoto')}
                   </Button>
                   {avatarUrl && (
                     <Button type="button" variant="danger" onClick={() => setAvatarUrl(null)}>
-                      Quitar
+                      {t('settings.remove')}
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-slate-500">PNG, JPG o WEBP · se recorta a cuadrado</p>
+                <p className="text-xs text-slate-500">{t('settings.photoHint')}</p>
                 {avatarError && <p className="text-xs text-red-600">{avatarError}</p>}
               </div>
               <input
@@ -156,10 +168,12 @@ export function SettingsPage() {
 
           {/* Datos personales */}
           <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-slate-800">Datos personales</h2>
+            <h2 className="text-base font-semibold text-slate-800">
+              {t('settings.personalTitle')}
+            </h2>
 
             <TextField
-              label="Nombre completo"
+              label={t('settings.fullName')}
               name="fullName"
               value={values.fullName}
               onChange={handleChange('fullName')}
@@ -167,7 +181,7 @@ export function SettingsPage() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               <TextField
-                label="Teléfono"
+                label={t('settings.phone')}
                 name="phone"
                 type="tel"
                 value={values.phone}
@@ -175,7 +189,7 @@ export function SettingsPage() {
                 error={fieldErrors.phone}
               />
               <TextField
-                label="Fecha de nacimiento"
+                label={t('settings.birthDate')}
                 name="birthDate"
                 type="date"
                 value={values.birthDate}
@@ -184,14 +198,14 @@ export function SettingsPage() {
               />
             </div>
             <TextField
-              label="Dirección"
+              label={t('settings.address')}
               name="address"
               value={values.address}
               onChange={handleChange('address')}
               error={fieldErrors.address}
             />
             <TextArea
-              label="Biografía (opcional)"
+              label={t('settings.bio')}
               name="bio"
               value={values.bio}
               onChange={handleChange('bio')}
@@ -201,10 +215,10 @@ export function SettingsPage() {
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="ghost" onClick={() => navigate('/dashboard')}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit" isLoading={mutation.isPending}>
-              Guardar cambios
+              {t('common.save')}
             </Button>
           </div>
         </form>

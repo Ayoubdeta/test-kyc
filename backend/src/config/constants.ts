@@ -199,3 +199,9 @@ export const RATE_LIMIT = {
   AUTH_WINDOW_MS: 15 * 60 * 1000,
   AUTH_MAX_REQUESTS: 20,
 } as const;
+
+// Idiomas soportados por la interfaz (i18n). El idioma preferido de cada
+// usuario se guarda en profiles.language. 'es' es el valor por defecto.
+export const SUPPORTED_LANGUAGES = ['es', 'ca', 'en', 'de', 'fr', 'ar', 'zh'] as const;
+export type Language = (typeof SUPPORTED_LANGUAGES)[number];
+export const DEFAULT_LANGUAGE: Language = 'es';

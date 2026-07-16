@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { AuthCarousel } from '../components/AuthCarousel';
 import { AppLogo, PoweredByDecal } from '../components/Brand';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 interface AuthLayoutProps {
   title: string;
@@ -52,6 +53,11 @@ export function AuthLayout({ title, subtitle, children, footer, size = 'md' }: A
 
         {/* Panel del formulario */}
         <div className="flex flex-col justify-center p-8 sm:p-10">
+          {/* Selector de idioma (disponible sin sesión) */}
+          <div className="mb-4 flex justify-end">
+            <LanguageSwitcher />
+          </div>
+
           {/* Marca en móvil (cuando el panel lateral está oculto) */}
           <div className="mb-6 flex items-center gap-2.5 md:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50">

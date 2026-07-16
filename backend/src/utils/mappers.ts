@@ -1,10 +1,13 @@
 import {
   CHAT_SENDER,
+  DEFAULT_LANGUAGE,
   DOCUMENT_STATUS,
   DOCUMENT_TYPES,
+  SUPPORTED_LANGUAGES,
   type ChatSender,
   type DocumentStatus,
   type DocumentTypeKey,
+  type Language,
 } from '../config/constants';
 import type {
   ActivityLogRow,
@@ -222,5 +225,11 @@ export function toPublicProfile(row: ProfileRow | null): PublicProfile {
     birthDate: row?.birth_date ? row.birth_date.toISOString().slice(0, 10) : null,
     bio: row?.bio ?? null,
     avatarUrl: row?.avatar_url ?? null,
+    language: toLanguage(row?.language),
   };
+}
+
+/** Normaliza el idioma guardado a uno soportado (con fallback al por defecto). */
+function toLanguage(value: string | null | undefined): Language {
+  return SUPPORTED_LANGUAGES.includes(value as Language) ? (value as Language) : DEFAULT_LANGUAGE;
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CLIENT_TYPE, ROLES } from '../config/constants';
+import { CLIENT_TYPE, ROLES, SUPPORTED_LANGUAGES } from '../config/constants';
 import { emailField, passwordField, usernameField } from './auth.validators';
 import {
   addressField,
@@ -38,6 +38,12 @@ export const createClientSchema = z.object({
   email: emailField,
 });
 
+// Preferencia de idioma del usuario autenticado (i18n).
+export const languageSchema = z.object({
+  language: z.enum(SUPPORTED_LANGUAGES),
+});
+
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type CreateClientInput = z.infer<typeof createClientSchema>;
+export type LanguageInput = z.infer<typeof languageSchema>;

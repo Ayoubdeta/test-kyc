@@ -4,6 +4,7 @@ import { AppLogo, PoweredByDecal } from '../components/Brand';
 import { ChatWidget } from '../components/ChatWidget';
 import { NotificationBell } from '../components/NotificationBell';
 import { UserMenu } from '../components/UserMenu';
+import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { canApprove, canReview, isStaff } from '../lib/roles';
 
@@ -11,32 +12,33 @@ import { canApprove, canReview, isStaff } from '../lib/roles';
 // y el contenido debajo.
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { me } = useAuth();
+  const { t } = useI18n();
   const location = useLocation();
 
   // Navegación adaptada al rol del usuario.
   const role = me?.user.role;
   const navItems: { to: string; label: string }[] = [
-    { to: '/dashboard', label: 'Panel' },
+    { to: '/dashboard', label: t('nav.dashboard') },
     ...(role === 'cliente'
       ? [
-          { to: '/documents', label: 'Mis documentos' },
-          { to: '/history', label: 'Historial' },
+          { to: '/documents', label: t('nav.myDocuments') },
+          { to: '/history', label: t('nav.history') },
         ]
       : []),
-    ...(isStaff(role) ? [{ to: '/review', label: 'Documentos' }] : []),
+    ...(isStaff(role) ? [{ to: '/review', label: t('nav.documents') }] : []),
     ...(canReview(role)
       ? [
-          { to: '/pending-review', label: 'Por revisar' },
-          { to: '/in-review', label: 'En revisión' },
+          { to: '/pending-review', label: t('nav.pendingReview') },
+          { to: '/in-review', label: t('nav.inReview') },
         ]
       : []),
-    ...(canApprove(role) ? [{ to: '/approvals', label: 'Pendientes de aprobar' }] : []),
-    ...(canReview(role) ? [{ to: '/chat', label: 'Chat' }] : []),
-    ...(isStaff(role) ? [{ to: '/kpis', label: 'KPIs' }] : []),
-    ...(isStaff(role) ? [{ to: '/reports', label: 'Informes' }] : []),
-    ...(role === 'admin' ? [{ to: '/users', label: 'Usuarios' }] : []),
-    ...(role === 'admin' ? [{ to: '/logs', label: 'Logs' }] : []),
-    { to: '/settings', label: 'Configurar cuenta' },
+    ...(canApprove(role) ? [{ to: '/approvals', label: t('nav.approvals') }] : []),
+    ...(canReview(role) ? [{ to: '/chat', label: t('nav.chat') }] : []),
+    ...(isStaff(role) ? [{ to: '/kpis', label: t('nav.kpis') }] : []),
+    ...(isStaff(role) ? [{ to: '/reports', label: t('nav.reports') }] : []),
+    ...(role === 'admin' ? [{ to: '/users', label: t('nav.users') }] : []),
+    ...(role === 'admin' ? [{ to: '/logs', label: t('nav.logs') }] : []),
+    { to: '/settings', label: t('nav.settings') },
   ];
 
   return (

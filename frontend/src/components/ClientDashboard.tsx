@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { documentsApi } from '../api/documents.api';
+import { useI18n } from '../i18n';
 import { useCountUp } from '../hooks/useCountUp';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import { displayValue, formatDate } from '../lib/format';
@@ -24,6 +25,7 @@ const TOTAL = DOCUMENT_TYPES.length;
 
 // Anillo de progreso circular animado (documentos aprobados / total).
 function ProgressRing({ pct, approved }: { pct: number; approved: number }) {
+  const { t } = useI18n();
   const size = 128;
   const stroke = 10;
   const r = (size - stroke) / 2;
@@ -63,7 +65,7 @@ function ProgressRing({ pct, approved }: { pct: number; approved: number }) {
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
         <span className="text-2xl font-bold leading-none">{shownPct}%</span>
         <span className="mt-1 text-[11px] font-medium text-white/80">
-          {approved}/{TOTAL} aprobados
+          {t('dashboard.approvedOf', { approved, total: TOTAL })}
         </span>
       </div>
     </div>
@@ -150,6 +152,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export function ClientDashboard({ me }: { me: MeResponse }) {
+  const { t } = useI18n();
   const { user, profile } = me;
   const displayName = profile.fullName ?? user.username;
 
@@ -169,12 +172,12 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
   // Mensaje contextual según la situación del cliente.
   const message =
     approved === TOTAL
-      ? '¡Toda tu documentación está aprobada!'
+      ? t('dashboard.msgAllApproved')
       : rejected > 0
-        ? 'Tienes documentos rechazados: vuelve a subirlos corregidos.'
+        ? t('dashboard.msgRejected')
         : inReview + pendingApproval > 0
-          ? 'Tu documentación se está revisando. Te avisaremos de cada cambio.'
-          : 'Completa tu documentación KYC para continuar.';
+          ? t('dashboard.msgInReview')
+          : t('dashboard.msgComplete');
 
   return (
     <div className="flex flex-col gap-6">
@@ -197,7 +200,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
               <Avatar src={profile.avatarUrl} name={displayName} size="md" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white/70">Bienvenido de nuevo</p>
+              <p className="text-sm font-medium text-white/70">{t('dashboard.welcome')}</p>
               <h1 className="text-2xl font-bold tracking-tight">
                 {displayValue(profile.fullName ?? user.username)}
               </h1>
@@ -211,7 +214,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
       {/* ─── Métricas con contador animado ─── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
-          label="Aprobados"
+          label={t('dashboard.statApproved')}
           value={approved}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           accent="text-green-600"
@@ -220,7 +223,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           delay={0}
         />
         <StatCard
-          label="En revisión"
+          label={t('dashboard.statInReview')}
           value={inReview}
           icon={<SearchIcon className="h-5 w-5" />}
           accent="text-blue-600"
@@ -229,7 +232,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           delay={70}
         />
         <StatCard
-          label="Pendiente de aprobación"
+          label={t('dashboard.statPendingApproval')}
           value={pendingApproval}
           icon={<InboxIcon className="h-5 w-5" />}
           accent="text-indigo-600"
@@ -238,7 +241,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           delay={140}
         />
         <StatCard
-          label="Rechazados"
+          label={t('dashboard.statRejected')}
           value={rejected}
           icon={<AlertTriangleIcon className="h-5 w-5" />}
           accent="text-red-600"
@@ -252,15 +255,15 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <ActionCard
           to="/documents"
-          title="Mis documentos"
-          description="Sube tus PDF y consulta su estado."
+          title={t('dashboard.actionDocsTitle')}
+          description={t('dashboard.actionDocsDesc')}
           icon={<FileTextIcon className="h-6 w-6" />}
           gradient="from-brand-500 to-brand-700"
         />
         <ActionCard
           to="/history"
-          title="Historial"
-          description="Cuándo se aprobaron o rechazaron tus documentos."
+          title={t('dashboard.actionHistoryTitle')}
+          description={t('dashboard.actionHistoryDesc')}
           icon={<HistoryIcon className="h-6 w-6" />}
           gradient="from-slate-600 to-slate-800"
         />
@@ -276,12 +279,12 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           style={{ animationDelay: '80ms' }}
         >
           <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800">
-            <UserIcon className="h-5 w-5 text-slate-400" /> Cuenta
+            <UserIcon className="h-5 w-5 text-slate-400" /> {t('dashboard.accountTitle')}
           </h2>
           <dl>
-            <InfoRow label="Usuario" value={user.username} />
-            <InfoRow label="Email" value={user.email} />
-            <InfoRow label="Miembro desde" value={formatDate(user.createdAt)} />
+            <InfoRow label={t('dashboard.username')} value={user.username} />
+            <InfoRow label={t('dashboard.email')} value={user.email} />
+            <InfoRow label={t('dashboard.memberSince')} value={formatDate(user.createdAt)} />
           </dl>
         </section>
         <section
@@ -289,18 +292,18 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           style={{ animationDelay: '160ms' }}
         >
           <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800">
-            <IdCardIcon className="h-5 w-5 text-slate-400" /> Perfil
+            <IdCardIcon className="h-5 w-5 text-slate-400" /> {t('dashboard.profileTitle')}
           </h2>
           <dl>
-            <InfoRow label="Nombre completo" value={displayValue(profile.fullName)} />
-            <InfoRow label="Teléfono" value={displayValue(profile.phone)} />
-            <InfoRow label="Dirección" value={displayValue(profile.address)} />
+            <InfoRow label={t('dashboard.fullName')} value={displayValue(profile.fullName)} />
+            <InfoRow label={t('dashboard.phone')} value={displayValue(profile.phone)} />
+            <InfoRow label={t('dashboard.address')} value={displayValue(profile.address)} />
           </dl>
           <Link
             to="/settings"
             className="mt-3 inline-flex text-sm font-medium text-brand-600 transition hover:text-brand-700"
           >
-            Editar perfil →
+            {t('dashboard.editProfile')}
           </Link>
         </section>
       </div>

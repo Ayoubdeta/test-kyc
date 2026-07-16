@@ -4,6 +4,7 @@ import { getApiErrorMessage } from '../api/client';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { TextField } from '../components/ui/TextField';
+import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { loginSchema } from '../validators/auth';
@@ -12,6 +13,7 @@ type FieldErrors = Partial<Record<'identifier' | 'password', string>>;
 
 export function LoginPage() {
   const { login } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [values, setValues] = useState({ identifier: '', password: '' });
@@ -47,7 +49,7 @@ export function LoginPage() {
       await login(parsed.data);
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      setFormError(getApiErrorMessage(err, 'No se pudo iniciar sesión'));
+      setFormError(getApiErrorMessage(err, t('login.error')));
     } finally {
       setSubmitting(false);
     }
@@ -55,19 +57,15 @@ export function LoginPage() {
 
   return (
     <AuthLayout
-      title="Bienvenido de nuevo"
-      subtitle="Introduce tus credenciales para acceder"
-      footer={
-        <span className="text-slate-500">
-          ¿Necesitas una cuenta? Tu gestor de Decal la crea y te envía un enlace de activación.
-        </span>
-      }
+      title={t('login.title')}
+      subtitle={t('login.subtitle')}
+      footer={<span className="text-slate-500">{t('login.footer')}</span>}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {formError && <Alert>{formError}</Alert>}
 
         <TextField
-          label="Usuario o email"
+          label={t('login.identifier')}
           name="identifier"
           autoComplete="username"
           value={values.identifier}
@@ -75,7 +73,7 @@ export function LoginPage() {
           error={fieldErrors.identifier}
         />
         <TextField
-          label="Contraseña"
+          label={t('login.password')}
           name="password"
           type="password"
           autoComplete="current-password"
@@ -85,7 +83,7 @@ export function LoginPage() {
         />
 
         <Button type="submit" isLoading={submitting} className="mt-2 w-full">
-          Iniciar sesión
+          {t('login.submit')}
         </Button>
       </form>
     </AuthLayout>

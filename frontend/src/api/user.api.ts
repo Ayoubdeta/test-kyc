@@ -26,4 +26,9 @@ export const userApi = {
     );
     return data.profile;
   },
+
+  /** Guarda la preferencia de idioma (i18n) del usuario autenticado. */
+  async setLanguage(language: string): Promise<void> {
+    await api.patch('/users/me/language', { language });
+  },
 };

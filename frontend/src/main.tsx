@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
 import { AuthProvider } from './context/AuthContext';
+import { I18nProvider } from './i18n';
 import './index.css';
 
 // Cliente de React Query: gestiona el estado del servidor (caché, reintentos).
@@ -25,7 +26,9 @@ createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <I18nProvider>
+            <App />
+          </I18nProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
