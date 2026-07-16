@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useI18n } from '../i18n';
 import { Button } from './ui/Button';
 
 interface PdfViewerModalProps {
@@ -21,6 +22,7 @@ export function PdfViewerModal({
   onClose,
   onDownload,
 }: PdfViewerModalProps) {
+  const { t } = useI18n();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -51,10 +53,10 @@ export function PdfViewerModal({
           </h2>
           <div className="flex shrink-0 items-center gap-2">
             <Button variant="primary" onClick={onDownload} disabled={!url}>
-              Descargar
+              {t('pdf.download')}
             </Button>
             <Button variant="ghost" onClick={onClose}>
-              Cerrar
+              {t('pdf.close')}
             </Button>
           </div>
         </div>
@@ -67,7 +69,7 @@ export function PdfViewerModal({
                 className="h-10 w-10 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"
                 aria-hidden="true"
               />
-              <span className="sr-only">Cargando documento…</span>
+              <span className="sr-only">{t('pdf.loadingDoc')}</span>
             </div>
           ) : (
             <iframe src={url} title={`PDF: ${title}`} className="h-full w-full border-0" />

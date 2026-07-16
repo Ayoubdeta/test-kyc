@@ -3,9 +3,11 @@ import { useMemo, useState } from 'react';
 import { statsApi } from '../api/stats.api';
 import { BarChart, DonutChart, KpiCard, TrendBars } from '../components/charts/Charts';
 import { Button } from '../components/ui/Button';
+import { useI18n } from '../i18n';
+import { docTypeLabel, statusLabel } from '../i18n/labels';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DOCUMENT_TYPES } from '../lib/documents';
-import { STATUS_HEX, STATUS_LABELS } from '../lib/roles';
+import { STATUS_HEX } from '../lib/roles';
 import type { DocumentStatus, DocumentTypeKey, StatsFilters } from '../types';
 
 const STATUS_ORDER: DocumentStatus[] = [
@@ -26,6 +28,7 @@ function shortMonth(m: string): string {
 const EMPTY_FILTERS: StatsFilters = {};
 
 export function KpisPage() {
+  const { t } = useI18n();
   // Estado del formulario (borrador) y filtros aplicados (los que consultan).
   const [draft, setDraft] = useState<StatsFilters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<StatsFilters>(EMPTY_FILTERS);
@@ -50,7 +53,7 @@ export function KpisPage() {
   };
 
   const donut = STATUS_ORDER.map((s) => ({
-    label: STATUS_LABELS[s],
+    label: statusLabel(t, s),
     value: statusCounts[s] ?? 0,
     color: STATUS_HEX[s],
   }));
@@ -58,17 +61,15 @@ export function KpisPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">KPIs de documentos</h1>
-        <p className="text-sm text-slate-500">
-          Analiza los documentos con filtros por fecha, tipo y estado.
-        </p>
+        <h1 className="text-xl font-bold text-slate-900">{t('kpi.pageTitle')}</h1>
+        <p className="text-sm text-slate-500">{t('staffDash.qlKpisDesc')}</p>
       </div>
 
       {/* Barra de filtros */}
       <div className="mb-6 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Desde</span>
+            <span className="font-medium text-slate-700">{t('kpi.from')}</span>
             <input
               type="date"
               value={draft.from ?? ''}
@@ -77,7 +78,7 @@ export function KpisPage() {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Hasta</span>
+            <span className="font-medium text-slate-700">{t('kpi.to')}</span>
             <input
               type="date"
               value={draft.to ?? ''}
@@ -86,7 +87,7 @@ export function KpisPage() {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Tipo</span>
+            <span className="font-medium text-slate-700">{t('kpi.type')}</span>
             <select
               value={draft.docType ?? ''}
               onChange={(e) =>
@@ -97,16 +98,16 @@ export function KpisPage() {
               }
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
-              <option value="">Todos</option>
-              {DOCUMENT_TYPES.map((t) => (
-                <option key={t.key} value={t.key}>
-                  {t.label}
+              <option value="">{t('kpi.all')}</option>
+              {DOCUMENT_TYPES.map((dt) => (
+                <option key={dt.key} value={dt.key}>
+                  {docTypeLabel(t, dt.key)}
                 </option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Estado</span>
+            <span className="font-medium text-slate-700">{t('kpi.statusLabel')}</span>
             <select
               value={draft.status ?? ''}
               onChange={(e) =>
@@ -117,21 +118,21 @@ export function KpisPage() {
               }
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
-              <option value="">Todos</option>
+              <option value="">{t('kpi.all')}</option>
               {STATUS_ORDER.map((s) => (
                 <option key={s} value={s}>
-                  {STATUS_LABELS[s]}
+                  {statusLabel(t, s)}
                 </option>
               ))}
             </select>
           </label>
           <div className="flex items-end gap-2">
             <Button onClick={apply} isLoading={isFetching}>
-              Aplicar
+              {t('kpi.apply')}
             </Button>
             {hasFilters && (
               <Button variant="ghost" onClick={reset}>
-                Limpiar
+                {t('kpi.clear')}
               </Button>
             )}
           </div>
@@ -139,40 +140,40 @@ export function KpisPage() {
       </div>
 
       {isLoading || !data ? (
-        <p className="text-sm text-slate-500">Cargando…</p>
+        <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-6">
           {/* Tarjetas KPI */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
-            <KpiCard label="Total" value={data.total} accent="text-slate-800" />
-            <KpiCard label="Pendientes" value={statusCounts.pendiente ?? 0} accent="text-slate-600" />
-            <KpiCard label="En revisión" value={statusCounts.en_revision ?? 0} accent="text-blue-600" />
+            <KpiCard label={t('kpi.total')} value={data.total} accent="text-slate-800" />
+            <KpiCard label={t('kpi.pending')} value={statusCounts.pendiente ?? 0} accent="text-slate-600" />
+            <KpiCard label={t('kpi.inReview')} value={statusCounts.en_revision ?? 0} accent="text-blue-600" />
             <KpiCard
-              label="Pendiente de aprobación"
+              label={t('kpi.pendingApproval')}
               value={statusCounts.pendiente_aprobacion ?? 0}
               accent="text-indigo-600"
             />
-            <KpiCard label="Aprobados" value={statusCounts.aprobado ?? 0} accent="text-green-600" />
-            <KpiCard label="Rechazados" value={statusCounts.rechazado ?? 0} accent="text-red-600" />
-            <KpiCard label="Caducados" value={statusCounts.caducado ?? 0} accent="text-amber-600" />
+            <KpiCard label={t('kpi.approved')} value={statusCounts.aprobado ?? 0} accent="text-green-600" />
+            <KpiCard label={t('kpi.rejected')} value={statusCounts.rechazado ?? 0} accent="text-red-600" />
+            <KpiCard label={t('kpi.expired')} value={statusCounts.caducado ?? 0} accent="text-amber-600" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-              <h3 className="mb-3 text-sm font-semibold text-slate-700">Por estado</h3>
+              <h3 className="mb-3 text-sm font-semibold text-slate-700">{t('kpi.byStatusShort')}</h3>
               <DonutChart segments={donut} />
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-              <h3 className="mb-3 text-sm font-semibold text-slate-700">Por tipo de documento</h3>
+              <h3 className="mb-3 text-sm font-semibold text-slate-700">{t('kpi.byType')}</h3>
               <BarChart
-                items={data.byType.map((t) => ({ label: t.label, value: t.count }))}
-                emptyText="Sin documentos para estos filtros."
+                items={data.byType.map((bt) => ({ label: docTypeLabel(t, bt.docType), value: bt.count }))}
+                emptyText={t('kpi.noneForFilters')}
               />
             </div>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Documentos enviados por mes</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">{t('kpi.byMonthPlain')}</h3>
             <TrendBars
               items={data.byMonth.map((m) => ({ label: shortMonth(m.month), value: m.uploaded }))}
             />
@@ -181,22 +182,22 @@ export function KpisPage() {
           {/* Tabla por usuario */}
           <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-card">
             <div className="border-b border-slate-100 px-5 py-3">
-              <h3 className="text-sm font-semibold text-slate-700">Por usuario</h3>
+              <h3 className="text-sm font-semibold text-slate-700">{t('kpi.byUser')}</h3>
             </div>
             {data.byUser.length === 0 ? (
-              <p className="p-6 text-sm text-slate-500">Sin datos para estos filtros.</p>
+              <p className="p-6 text-sm text-slate-500">{t('kpi.noDataForFilters')}</p>
             ) : (
               <table className="w-full min-w-[720px] text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-4 py-3">Usuario</th>
-                    <th className="px-4 py-3 text-right">Total</th>
-                    <th className="px-4 py-3 text-right">Pend.</th>
-                    <th className="px-4 py-3 text-right">En rev.</th>
-                    <th className="px-4 py-3 text-right">P. aprob.</th>
-                    <th className="px-4 py-3 text-right">Aprob.</th>
-                    <th className="px-4 py-3 text-right">Rech.</th>
-                    <th className="px-4 py-3 text-right">Cad.</th>
+                    <th className="px-4 py-3">{t('kpi.thUser')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thTotal')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thPending')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thInReview')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thPendingApproval')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thApproved')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thRejected')}</th>
+                    <th className="px-4 py-3 text-right">{t('kpi.thExpired')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">

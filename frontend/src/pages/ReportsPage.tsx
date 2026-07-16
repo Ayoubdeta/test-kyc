@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { reportsApi } from '../api/reports.api';
 import { FileTextIcon, InboxIcon, SearchIcon } from '../components/icons';
 import { Button } from '../components/ui/Button';
+import { useI18n } from '../i18n';
+import { docTypeLabel, statusLabel } from '../i18n/labels';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { exportCsv, type CsvColumn } from '../lib/csv';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import { formatDate } from '../lib/format';
-import { STATUS_BADGE_CLASSES, STATUS_LABELS } from '../lib/roles';
+import { STATUS_BADGE_CLASSES } from '../lib/roles';
 import type { DocumentStatus, DocumentTypeKey, ReportFilters, ReportRow } from '../types';
 
 const STATUS_ORDER: DocumentStatus[] = [
@@ -21,25 +23,26 @@ const STATUS_ORDER: DocumentStatus[] = [
 
 const EMPTY_FILTERS: ReportFilters = {};
 
-// Columnas del CSV: una única fuente de verdad para la tabla y la exportación.
-const CSV_COLUMNS: CsvColumn<ReportRow>[] = [
-  { header: 'Cliente', value: (r) => r.clientName },
-  { header: 'Email', value: (r) => r.clientEmail },
-  { header: 'Documento', value: (r) => r.docLabel },
-  { header: 'Archivo', value: (r) => r.originalName },
-  { header: 'Estado', value: (r) => STATUS_LABELS[r.status] },
-  { header: 'Enviado', value: (r) => formatDate(r.uploadedAt) },
-  { header: 'Revisado por', value: (r) => r.reviewerName ?? '' },
-  { header: 'Fecha revisión', value: (r) => (r.reviewedAt ? formatDate(r.reviewedAt) : '') },
-  { header: 'Decidido por', value: (r) => r.deciderName ?? '' },
-  { header: 'Fecha decisión', value: (r) => (r.decidedAt ? formatDate(r.decidedAt) : '') },
-  { header: 'Caduca', value: (r) => (r.expiresAt ? formatDate(r.expiresAt) : '') },
-  { header: 'Motivo', value: (r) => r.comment ?? '' },
-];
-
 export function ReportsPage() {
+  const { t } = useI18n();
   const [draft, setDraft] = useState<ReportFilters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<ReportFilters>(EMPTY_FILTERS);
+
+  // Columnas del CSV: una única fuente de verdad para la tabla y la exportación.
+  const CSV_COLUMNS: CsvColumn<ReportRow>[] = [
+    { header: t('rep.csvClient'), value: (r) => r.clientName },
+    { header: t('rep.csvEmail'), value: (r) => r.clientEmail },
+    { header: t('rep.csvDocument'), value: (r) => r.docLabel },
+    { header: t('rep.csvFile'), value: (r) => r.originalName },
+    { header: t('rep.csvStatus'), value: (r) => statusLabel(t, r.status) },
+    { header: t('rep.csvSent'), value: (r) => formatDate(r.uploadedAt) },
+    { header: t('rep.csvReviewedBy'), value: (r) => r.reviewerName ?? '' },
+    { header: t('rep.csvReviewDate'), value: (r) => (r.reviewedAt ? formatDate(r.reviewedAt) : '') },
+    { header: t('rep.csvDecidedBy'), value: (r) => r.deciderName ?? '' },
+    { header: t('rep.csvDecisionDate'), value: (r) => (r.decidedAt ? formatDate(r.decidedAt) : '') },
+    { header: t('rep.csvExpires'), value: (r) => (r.expiresAt ? formatDate(r.expiresAt) : '') },
+    { header: t('rep.csvReason'), value: (r) => r.comment ?? '' },
+  ];
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['reports', 'documents', applied],
@@ -66,10 +69,8 @@ export function ReportsPage() {
     <DashboardLayout>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Informes</h1>
-          <p className="text-sm text-slate-500">
-            Detalle de documentos por fecha, tipo y estado (incluye cancelados y su motivo).
-          </p>
+          <h1 className="text-xl font-bold text-slate-900">{t('rep.title')}</h1>
+          <p className="text-sm text-slate-500">{t('rep.subtitle')}</p>
         </div>
         <Button
           variant="ghost"
@@ -77,7 +78,7 @@ export function ReportsPage() {
           disabled={!data || data.rows.length === 0}
         >
           <FileTextIcon className="h-4 w-4" />
-          Exportar CSV
+          {t('rep.exportCsv')}
         </Button>
       </div>
 
@@ -85,7 +86,7 @@ export function ReportsPage() {
       <div className="mb-6 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Desde</span>
+            <span className="font-medium text-slate-700">{t('kpi.from')}</span>
             <input
               type="date"
               value={draft.from ?? ''}
@@ -94,7 +95,7 @@ export function ReportsPage() {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Hasta</span>
+            <span className="font-medium text-slate-700">{t('kpi.to')}</span>
             <input
               type="date"
               value={draft.to ?? ''}
@@ -103,7 +104,7 @@ export function ReportsPage() {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Tipo</span>
+            <span className="font-medium text-slate-700">{t('kpi.type')}</span>
             <select
               value={draft.docType ?? ''}
               onChange={(e) =>
@@ -114,16 +115,16 @@ export function ReportsPage() {
               }
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
-              <option value="">Todos</option>
-              {DOCUMENT_TYPES.map((t) => (
-                <option key={t.key} value={t.key}>
-                  {t.label}
+              <option value="">{t('kpi.all')}</option>
+              {DOCUMENT_TYPES.map((dt) => (
+                <option key={dt.key} value={dt.key}>
+                  {docTypeLabel(t, dt.key)}
                 </option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Estado</span>
+            <span className="font-medium text-slate-700">{t('kpi.statusLabel')}</span>
             <select
               value={draft.status ?? ''}
               onChange={(e) =>
@@ -134,21 +135,21 @@ export function ReportsPage() {
               }
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
-              <option value="">Todos</option>
+              <option value="">{t('kpi.all')}</option>
               {STATUS_ORDER.map((s) => (
                 <option key={s} value={s}>
-                  {STATUS_LABELS[s]}
+                  {statusLabel(t, s)}
                 </option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">Cliente</span>
+            <span className="font-medium text-slate-700">{t('rep.client')}</span>
             <div className="relative">
               <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Nombre o email"
+                placeholder={t('rep.searchPlaceholder')}
                 value={draft.search ?? ''}
                 onChange={(e) => setDraft((d) => ({ ...d, search: e.target.value || undefined }))}
                 onKeyDown={(e) => e.key === 'Enter' && apply()}
@@ -159,39 +160,39 @@ export function ReportsPage() {
         </div>
         <div className="mt-4 flex items-center gap-2">
           <Button onClick={apply} isLoading={isFetching}>
-            Aplicar
+            {t('kpi.apply')}
           </Button>
           {hasFilters && (
             <Button variant="ghost" onClick={reset}>
-              Limpiar
+              {t('kpi.clear')}
             </Button>
           )}
         </div>
       </div>
 
       {isLoading || !data ? (
-        <p className="text-sm text-slate-500">Cargando…</p>
+        <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-4">
           {/* Resumen */}
           <div className="grid grid-cols-3 gap-3">
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
+              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.total')}</p>
               <p className="mt-1 text-2xl font-bold text-slate-800">{data.total}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Aprobados</p>
+              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.approved')}</p>
               <p className="mt-1 text-2xl font-bold text-green-600">{data.summary.aprobados}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Cancelados / rechazados</p>
+              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.cancelledRejected')}</p>
               <p className="mt-1 text-2xl font-bold text-red-600">{data.summary.rechazados}</p>
             </div>
           </div>
 
           {data.truncated && (
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
-              Mostrando las primeras {data.limit} filas. Afina los filtros para acotar el informe.
+              {t('rep.truncated', { limit: data.limit })}
             </p>
           )}
 
@@ -200,18 +201,18 @@ export function ReportsPage() {
             {data.rows.length === 0 ? (
               <div className="flex flex-col items-center gap-2 p-10 text-center">
                 <InboxIcon className="h-8 w-8 text-slate-300" />
-                <p className="text-sm text-slate-500">Sin resultados para estos filtros.</p>
+                <p className="text-sm text-slate-500">{t('rep.empty')}</p>
               </div>
             ) : (
               <table className="w-full min-w-[900px] text-left text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-4 py-3">Cliente</th>
-                    <th className="px-4 py-3">Documento</th>
-                    <th className="px-4 py-3">Estado</th>
-                    <th className="px-4 py-3">Enviado</th>
-                    <th className="px-4 py-3">Decidido</th>
-                    <th className="px-4 py-3">Motivo</th>
+                    <th className="px-4 py-3">{t('rep.thClient')}</th>
+                    <th className="px-4 py-3">{t('rep.thDocument')}</th>
+                    <th className="px-4 py-3">{t('rep.thStatus')}</th>
+                    <th className="px-4 py-3">{t('rep.thSent')}</th>
+                    <th className="px-4 py-3">{t('rep.thDecided')}</th>
+                    <th className="px-4 py-3">{t('rep.thReason')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -226,7 +227,7 @@ export function ReportsPage() {
                         <span
                           className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASSES[r.status]}`}
                         >
-                          {STATUS_LABELS[r.status]}
+                          {statusLabel(t, r.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-600">{formatDate(r.uploadedAt)}</td>

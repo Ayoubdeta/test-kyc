@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useI18n } from '../i18n';
+import type { I18nContextValue } from '../i18n';
 import { formatDate, formatDateTime } from '../lib/format';
 import type { ChatMessage } from '../types';
 import { ChatAttachmentView } from './ChatAttachmentView';
@@ -29,14 +31,14 @@ const EMOJIS = ['👍', '❤️', '😂', '🎉', '🙏', '😮', '😢', '✅']
 const MAX_ATTACH_MB = 10;
 
 // Etiqueta de día para los separadores (Hoy / Ayer / fecha).
-function dayLabel(iso: string): string {
+function dayLabel(iso: string, t: I18nContextValue['t']): string {
   const d = new Date(iso);
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
   const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
-  if (sameDay(d, today)) return 'Hoy';
-  if (sameDay(d, yesterday)) return 'Ayer';
+  if (sameDay(d, today)) return t('chat.today');
+  if (sameDay(d, yesterday)) return t('chat.yesterday');
   return formatDate(iso);
 }
 
@@ -51,8 +53,9 @@ export function ChatThread({
   isSending = false,
   isLoading = false,
   disabled = false,
-  emptyText = 'Todavía no hay mensajes. Escribe el primero.',
+  emptyText,
 }: Props) {
+  const { t } = useI18n();
   const [draft, setDraft] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
@@ -107,7 +110,7 @@ export function ChatThread({
   const pickFile = (f: File | null) => {
     if (!f) return;
     if (f.size > MAX_ATTACH_MB * 1024 * 1024) {
-      alert(`El archivo supera el límite de ${MAX_ATTACH_MB} MB`);
+      alert(t('chat.attachTooLarge', { mb: MAX_ATTACH_MB }));
       return;
     }
     setFile(f);
@@ -134,7 +137,7 @@ export function ChatThread({
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar en la conversación…"
+            placeholder={t('chat.searchPlaceholder')}
             className="flex-1 rounded-md border border-slate-200 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-brand-500"
           />
         )}
@@ -145,7 +148,7 @@ export function ChatThread({
             setSearch('');
           }}
           className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          aria-label="Buscar"
+          aria-label={t('chat.search')}
         >
           <SearchIcon className="h-4 w-4" />
         </button>
@@ -153,15 +156,15 @@ export function ChatThread({
 
       <div className="flex-1 space-y-1 overflow-y-auto p-3">
         {isLoading ? (
-          <p className="py-6 text-center text-sm text-slate-400">Cargando…</p>
+          <p className="py-6 text-center text-sm text-slate-400">{t('common.loading')}</p>
         ) : visible.length === 0 ? (
           <p className="py-6 text-center text-sm text-slate-400">
-            {search ? 'Sin resultados.' : emptyText}
+            {search ? t('chat.noResults') : emptyText ?? t('chat.emptyThread')}
           </p>
         ) : (
           visible.map((m) => {
-            const showDay = !search && dayLabel(m.createdAt) !== lastDay;
-            if (showDay) lastDay = dayLabel(m.createdAt);
+            const showDay = !search && dayLabel(m.createdAt, t) !== lastDay;
+            if (showDay) lastDay = dayLabel(m.createdAt, t);
             return (
               <div key={m.id}>
                 {showDay && (
@@ -211,15 +214,15 @@ export function ChatThread({
                           />
                           <div className="flex justify-end gap-2 text-xs">
                             <button onClick={() => setEditingId(null)} className="text-white/80 hover:underline">
-                              Cancelar
+                              {t('common.cancel')}
                             </button>
                             <button onClick={saveEdit} className="font-semibold text-white hover:underline">
-                              Guardar
+                              {t('chat.save')}
                             </button>
                           </div>
                         </div>
                       ) : m.deleted ? (
-                        <p className="italic opacity-70">Mensaje eliminado</p>
+                        <p className="italic opacity-70">{t('chat.deletedMsg')}</p>
                       ) : (
                         <>
                           {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
@@ -234,7 +237,7 @@ export function ChatThread({
                           m.mine ? 'text-white/70' : 'text-slate-400'
                         }`}
                       >
-                        {m.editedAt && !m.deleted && <span>editado</span>}
+                        {m.editedAt && !m.deleted && <span>{t('chat.edited')}</span>}
                         <span>{formatDateTime(m.createdAt)}</span>
                         {/* Ticks de lectura (solo mensajes propios) */}
                         {m.mine && !m.deleted && (
@@ -273,14 +276,14 @@ export function ChatThread({
                         }`}
                       >
                         <button onClick={() => setReplyTo(m)} className="hover:text-slate-700">
-                          Responder
+                          {t('chat.reply')}
                         </button>
                         <div className="relative">
                           <button
                             onClick={() => setReactFor(reactFor === m.id ? null : m.id)}
                             className="hover:text-slate-700"
                           >
-                            Reaccionar
+                            {t('chat.react')}
                           </button>
                           {reactFor === m.id && (
                             <div className="absolute bottom-6 z-10 flex gap-1 rounded-full border border-slate-200 bg-white px-2 py-1 shadow-elevated">
@@ -301,7 +304,7 @@ export function ChatThread({
                         </div>
                         {m.mine && m.body && onEdit && (
                           <button onClick={() => startEdit(m)} className="hover:text-slate-700">
-                            Editar
+                            {t('chat.edit')}
                           </button>
                         )}
                         {m.mine && onDelete && (
@@ -309,7 +312,7 @@ export function ChatThread({
                             onClick={() => onDelete(m.id)}
                             className="hover:text-red-600"
                           >
-                            Borrar
+                            {t('chat.delete')}
                           </button>
                         )}
                       </div>
@@ -332,7 +335,8 @@ export function ChatThread({
       {replyTo && (
         <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
           <span className="min-w-0 truncate text-slate-500">
-            Respondiendo a: <span className="text-slate-700">{replyTo.body || 'adjunto'}</span>
+            {t('chat.replyingTo')}{' '}
+            <span className="text-slate-700">{replyTo.body || t('chat.attachmentWord')}</span>
           </span>
           <button onClick={() => setReplyTo(null)} className="ml-2 text-slate-400 hover:text-slate-600">
             ✕
@@ -343,7 +347,7 @@ export function ChatThread({
       {/* Adjunto seleccionado */}
       {file && (
         <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
-          <span className="min-w-0 truncate text-slate-600">Adjunto: {file.name}</span>
+          <span className="min-w-0 truncate text-slate-600">{t('chat.attachmentLabel')} {file.name}</span>
           <button onClick={() => setFile(null)} className="ml-2 text-slate-400 hover:text-slate-600">
             ✕
           </button>
@@ -381,8 +385,8 @@ export function ChatThread({
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
           className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50"
-          aria-label="Adjuntar archivo"
-          title="Adjuntar PDF o imagen"
+          aria-label={t('chat.attachFile')}
+          title={t('chat.attachTitle')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
             <path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3 3 0 0 1 4.24 4.24l-9.2 9.19a1 1 0 0 1-1.41-1.41l8.49-8.49" />
@@ -393,7 +397,7 @@ export function ChatThread({
           onClick={() => setShowEmoji((s) => !s)}
           disabled={disabled}
           className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50"
-          aria-label="Emojis"
+          aria-label={t('chat.emojis')}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
             <circle cx="12" cy="12" r="9" />
@@ -409,7 +413,7 @@ export function ChatThread({
           onKeyDown={onKeyDown}
           disabled={disabled}
           rows={1}
-          placeholder={disabled ? 'Selecciona una conversación' : 'Escribe un mensaje…'}
+          placeholder={disabled ? t('chat.selectConversationPlaceholder') : t('chat.writeMessage')}
           className="max-h-28 min-h-[2.5rem] flex-1 resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-50"
         />
         <button
@@ -418,7 +422,7 @@ export function ChatThread({
           disabled={disabled || isSending || (draft.trim() === '' && !file)}
           className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
         >
-          Enviar
+          {t('chat.send')}
         </button>
       </div>
     </div>

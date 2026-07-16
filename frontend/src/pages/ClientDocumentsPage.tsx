@@ -8,6 +8,8 @@ import { PdfViewerModal } from '../components/PdfViewerModal';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { usePdfPreview } from '../hooks/usePdfPreview';
+import { useI18n } from '../i18n';
+import { docTypeLabel } from '../i18n/labels';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import { formatDate } from '../lib/format';
@@ -16,6 +18,7 @@ import type { DocumentItem, DocumentTypeKey } from '../types';
 const DOCS_KEY = ['documents', 'mine'] as const;
 
 export function ClientDocumentsPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingType = useRef<DocumentTypeKey | null>(null);
@@ -42,7 +45,7 @@ export function ClientDocumentsPage() {
     mutationFn: ({ docType, file }: { docType: DocumentTypeKey; file: File }) =>
       documentsApi.upload(docType, file),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: DOCS_KEY }),
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo subir el documento')),
+    onError: (err) => setError(getApiErrorMessage(err, t('docs.uploadError'))),
     onSettled: () => setUploadingType(null),
   });
 
@@ -57,7 +60,7 @@ export function ClientDocumentsPage() {
     const docType = pendingType.current;
     if (file && docType) {
       if (file.type !== 'application/pdf') {
-        setError('Solo se admiten archivos PDF.');
+        setError(t('docs.onlyPdf'));
       } else {
         setUploadingType(docType);
         uploadMutation.mutate({ docType, file });
@@ -71,14 +74,13 @@ export function ClientDocumentsPage() {
     <DashboardLayout>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Mis documentos</h1>
-          <p className="text-sm text-slate-500">
-            Sube en PDF los documentos requeridos. Compliance los revisará.
-          </p>
+          <h1 className="text-xl font-bold text-slate-900">{t('docs.title')}</h1>
+          <p className="text-sm text-slate-500">{t('docs.subtitle')}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm shadow-card">
-          <span className="font-semibold text-slate-800">{approvedCount}</span>
-          <span className="text-slate-500"> / {DOCUMENT_TYPES.length} aprobados</span>
+          <span className="font-semibold text-slate-800">
+            {t('dashboard.approvedOf', { approved: approvedCount, total: DOCUMENT_TYPES.length })}
+          </span>
         </div>
       </div>
 
@@ -89,7 +91,7 @@ export function ClientDocumentsPage() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Cargando…</p>
+        <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {DOCUMENT_TYPES.map((type) => {
@@ -104,14 +106,14 @@ export function ClientDocumentsPage() {
                   <DocTypeIcon docType={type.key} className="h-6 w-6 shrink-0 text-brand-600" />
                   <div className="min-w-0 flex-1">
                     <h3 className="text-sm font-semibold leading-snug text-slate-800">
-                      {type.label}
+                      {docTypeLabel(t, type.key)}
                     </h3>
                     <div className="mt-1.5">
                       {doc ? (
                         <StatusBadge status={doc.status} />
                       ) : (
                         <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500">
-                          No subido
+                          {t('common.notUploaded')}
                         </span>
                       )}
                     </div>
@@ -121,34 +123,38 @@ export function ClientDocumentsPage() {
                 {/* Detalle según estado */}
                 <div className="mt-3 min-h-[1.25rem] text-xs text-slate-500">
                   {doc?.status === 'aprobado' && doc.expiresAt && (
-                    <span className="text-green-700">Válido hasta el {formatDate(doc.expiresAt)}</span>
+                    <span className="text-green-700">
+                      {t('docs.validUntil', { date: formatDate(doc.expiresAt) })}
+                    </span>
                   )}
                   {doc?.status === 'caducado' && (
                     <span className="text-amber-700">
-                      Caducado el {formatDate(doc.expiresAt)} · vuelve a subirlo
+                      {t('docs.expiredOn', { date: formatDate(doc.expiresAt) })}
                     </span>
                   )}
                   {doc?.status === 'rechazado' && (
                     <span className="text-red-600">
-                      {doc.reviewComment ? `Motivo: ${doc.reviewComment}` : 'Documento rechazado'}
+                      {doc.reviewComment
+                        ? `${t('common.reason')}: ${doc.reviewComment}`
+                        : t('docs.rejected')}
                     </span>
                   )}
-                  {doc?.status === 'pendiente' && <span>Pendiente de revisión</span>}
+                  {doc?.status === 'pendiente' && <span>{t('docs.pendingReview')}</span>}
                   {doc?.status === 'en_revision' && (
-                    <span className="text-blue-700">En revisión</span>
+                    <span className="text-blue-700">{t('docs.inReview')}</span>
                   )}
                   {doc?.status === 'pendiente_aprobacion' && (
-                    <span className="text-indigo-700">Pendiente de aprobación por Dirección</span>
+                    <span className="text-indigo-700">{t('docs.pendingApprovalByDireccion')}</span>
                   )}
                 </div>
 
                 <div className="mt-4 flex gap-2">
                   <Button onClick={() => triggerUpload(type.key)} isLoading={busy}>
-                    {doc ? 'Sustituir' : 'Subir PDF'}
+                    {doc ? t('docs.replace') : t('docs.uploadPdf')}
                   </Button>
                   {doc && (
                     <Button variant="ghost" onClick={() => preview.preview(doc)}>
-                      Ver
+                      {t('common.view')}
                     </Button>
                   )}
                 </div>

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { chatApi, type SendPayload } from '../api/chat.api';
 import { ChatThread } from '../components/ChatThread';
 import { useChatStream } from '../hooks/useChatStream';
+import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { formatDateTime } from '../lib/format';
 import type { ChatStreamEvent } from '../types';
@@ -10,6 +11,7 @@ import type { ChatStreamEvent } from '../types';
 const CONV_KEY = ['chat', 'conversations'] as const;
 
 export function ChatPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<string | null>(null);
   const [typingLabel, setTypingLabel] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export function ChatPage() {
     (ev: ChatStreamEvent) => {
       if (ev.type === 'typing') {
         if (ev.clientId === selectedRef.current) {
-          setTypingLabel('El cliente está escribiendo…');
+          setTypingLabel(t('chat.clientTyping'));
           clearTimeout(typingTimer.current);
           typingTimer.current = setTimeout(() => setTypingLabel(null), 3000);
         }
@@ -46,7 +48,7 @@ export function ChatPage() {
         void queryClient.invalidateQueries({ queryKey: ['chat', 'conversation', ev.clientId] });
       }
     },
-    [queryClient],
+    [queryClient, t],
   );
   useChatStream(onEvent);
 
@@ -85,20 +87,20 @@ export function ChatPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">Chat con clientes</h1>
-        <p className="text-sm text-slate-500">Responde las consultas de los clientes en tiempo real.</p>
+        <h1 className="text-xl font-bold text-slate-900">{t('chat.pageTitle')}</h1>
+        <p className="text-sm text-slate-500">{t('chat.pageSubtitle')}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
         {/* Lista de conversaciones */}
         <div className="animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
           <div className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
-            Conversaciones
+            {t('chat.conversations')}
           </div>
           {isLoading ? (
-            <p className="p-4 text-sm text-slate-500">Cargando…</p>
+            <p className="p-4 text-sm text-slate-500">{t('common.loading')}</p>
           ) : conversations.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">Aún no hay conversaciones.</p>
+            <p className="p-4 text-sm text-slate-500">{t('chat.noConversations')}</p>
           ) : (
             <ul className="max-h-[28rem] divide-y divide-slate-100 overflow-y-auto">
               {conversations.map((c) => (
@@ -151,7 +153,7 @@ export function ChatPage() {
             </>
           ) : (
             <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-slate-400">
-              Selecciona una conversación para ver los mensajes.
+              {t('chat.selectToView')}
             </div>
           )}
         </div>

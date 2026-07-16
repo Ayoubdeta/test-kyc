@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { adminApi, type AdminUpdateUserPayload } from '../api/admin.api';
 import { getApiErrorMessage } from '../api/client';
-import { ALL_ROLES, ROLE_LABELS } from '../lib/roles';
+import { useI18n } from '../i18n';
+import { roleLabel } from '../i18n/labels';
+import { ALL_ROLES } from '../lib/roles';
 import { adminUserSchema, resetPasswordSchema } from '../validators/adminUser';
 import type { Role } from '../types';
 import { Alert } from './ui/Alert';
@@ -45,6 +47,7 @@ const EMPTY: FormValues = {
 };
 
 export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const [values, setValues] = useState<FormValues>(EMPTY);
@@ -87,18 +90,18 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
     mutationFn: (payload: AdminUpdateUserPayload) => adminApi.updateUser(userId, payload),
     onSuccess: async () => {
       await invalidateUsers();
-      setSuccess('Cambios guardados.');
+      setSuccess(t('eu.saved'));
     },
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudieron guardar los cambios')),
+    onError: (err) => setError(getApiErrorMessage(err, t('eu.errSave'))),
   });
 
   const passwordMutation = useMutation({
     mutationFn: (password: string) => adminApi.resetPassword(userId, password),
     onSuccess: () => {
       setNewPassword('');
-      setSuccess('Contraseña restablecida. Se han cerrado las sesiones del usuario.');
+      setSuccess(t('eu.pwResetOk'));
     },
-    onError: (err) => setPasswordError(getApiErrorMessage(err, 'No se pudo restablecer')),
+    onError: (err) => setPasswordError(getApiErrorMessage(err, t('eu.errReset'))),
   });
 
   const deleteMutation = useMutation({
@@ -107,7 +110,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
       await invalidateUsers();
       onClose();
     },
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo eliminar el usuario')),
+    onError: (err) => setError(getApiErrorMessage(err, t('eu.errDelete'))),
   });
 
   const handleChange = (field: keyof FormValues) => (
@@ -140,7 +143,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
     setSuccess(null);
     const parsed = resetPasswordSchema.safeParse({ password: newPassword });
     if (!parsed.success) {
-      setPasswordError(parsed.error.issues[0]?.message ?? 'Contraseña inválida');
+      setPasswordError(parsed.error.issues[0]?.message ?? t('eu.pwInvalid'));
       return;
     }
     passwordMutation.mutate(newPassword);
@@ -151,7 +154,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
       className="fixed inset-0 z-50 flex animate-fade-in items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="Editar usuario"
+      aria-label={t('eu.title')}
       onClick={onClose}
     >
       <div
@@ -159,11 +162,11 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Usuario</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t('eu.title')}</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600"
-            aria-label="Cerrar"
+            aria-label={t('eu.close')}
           >
             ✕
           </button>
@@ -172,9 +175,9 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
         {/* Pestañas: cuenta / documentos / historial */}
         <div className="mb-5 flex gap-1 border-b border-slate-200">
           {([
-            ['cuenta', 'Cuenta'],
-            ['documentos', 'Documentos'],
-            ['historial', 'Historial'],
+            ['cuenta', t('eu.tabAccount')],
+            ['documentos', t('eu.tabDocuments')],
+            ['historial', t('eu.tabHistory')],
           ] as [Tab, string][]).map(([key, label]) => (
             <button
               key={key}
@@ -196,7 +199,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
 
         {tab === 'cuenta' &&
           (isLoading ? (
-            <p className="py-8 text-center text-sm text-slate-500">Cargando…</p>
+            <p className="py-8 text-center text-sm text-slate-500">{t('common.loading')}</p>
           ) : (
             <div className="flex flex-col gap-6">
             {error && <Alert>{error}</Alert>}
@@ -206,7 +209,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
             <form onSubmit={handleSave} className="flex flex-col gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField
-                  label="Usuario"
+                  label={t('eu.username')}
                   name="username"
                   value={values.username}
                   onChange={handleChange('username')}
@@ -214,7 +217,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                 />
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="role" className="text-sm font-medium text-slate-700">
-                    Rol
+                    {t('eu.role')}
                   </label>
                   <select
                     id="role"
@@ -225,20 +228,18 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                   >
                     {ALL_ROLES.map((role) => (
                       <option key={role} value={role}>
-                        {ROLE_LABELS[role]}
+                        {roleLabel(t, role)}
                       </option>
                     ))}
                   </select>
                   {isSelf && (
-                    <span className="text-xs text-slate-400">
-                      No puedes cambiar tu propio rol.
-                    </span>
+                    <span className="text-xs text-slate-400">{t('eu.cantChangeOwnRole')}</span>
                   )}
                 </div>
               </div>
 
               <TextField
-                label="Email"
+                label={t('eu.email')}
                 name="email"
                 type="email"
                 value={values.email}
@@ -246,7 +247,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                 error={fieldErrors.email}
               />
               <TextField
-                label="Nombre completo"
+                label={t('eu.fullName')}
                 name="fullName"
                 value={values.fullName}
                 onChange={handleChange('fullName')}
@@ -254,14 +255,14 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
               />
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField
-                  label="Teléfono"
+                  label={t('eu.phone')}
                   name="phone"
                   value={values.phone}
                   onChange={handleChange('phone')}
                   error={fieldErrors.phone}
                 />
                 <TextField
-                  label="Fecha de nacimiento"
+                  label={t('eu.birthDate')}
                   name="birthDate"
                   type="date"
                   value={values.birthDate}
@@ -270,14 +271,14 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                 />
               </div>
               <TextField
-                label="Dirección"
+                label={t('eu.address')}
                 name="address"
                 value={values.address}
                 onChange={handleChange('address')}
                 error={fieldErrors.address}
               />
               <TextArea
-                label="Biografía (opcional)"
+                label={t('eu.bio')}
                 name="bio"
                 value={values.bio}
                 onChange={handleChange('bio')}
@@ -285,26 +286,24 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
               />
               <div className="flex justify-end">
                 <Button type="submit" isLoading={updateMutation.isPending}>
-                  Guardar cambios
+                  {t('eu.save')}
                 </Button>
               </div>
             </form>
 
             {/* Restablecer contraseña */}
             <div className="border-t border-slate-200 pt-5">
-              <h3 className="mb-2 text-sm font-semibold text-slate-800">
-                Restablecer contraseña
-              </h3>
+              <h3 className="mb-2 text-sm font-semibold text-slate-800">{t('eu.resetPwTitle')}</h3>
               <div className="flex items-end gap-3">
                 <div className="flex-1">
                   <TextField
-                    label="Nueva contraseña"
+                    label={t('eu.newPassword')}
                     name="newPassword"
                     type="text"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     error={passwordError ?? undefined}
-                    placeholder="Mín. 8, con mayús., minús. y número"
+                    placeholder={t('eu.newPasswordPlaceholder')}
                   />
                 </div>
                 <Button
@@ -312,7 +311,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                   onClick={handleResetPassword}
                   isLoading={passwordMutation.isPending}
                 >
-                  Restablecer
+                  {t('eu.reset')}
                 </Button>
               </div>
             </div>
@@ -320,26 +319,24 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
             {/* Eliminar usuario */}
             {!isSelf && (
               <div className="border-t border-slate-200 pt-5">
-                <h3 className="mb-2 text-sm font-semibold text-red-700">Zona peligrosa</h3>
+                <h3 className="mb-2 text-sm font-semibold text-red-700">{t('eu.dangerZone')}</h3>
                 {confirmingDelete ? (
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-600">
-                      ¿Eliminar definitivamente a este usuario y todos sus datos?
-                    </span>
+                    <span className="text-sm text-slate-600">{t('eu.confirmDelete')}</span>
                     <Button
                       variant="danger"
                       onClick={() => deleteMutation.mutate()}
                       isLoading={deleteMutation.isPending}
                     >
-                      Sí, eliminar
+                      {t('eu.confirmDeleteYes')}
                     </Button>
                     <Button variant="ghost" onClick={() => setConfirmingDelete(false)}>
-                      Cancelar
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 ) : (
                   <Button variant="danger" onClick={() => setConfirmingDelete(true)}>
-                    Eliminar usuario
+                    {t('eu.deleteUser')}
                   </Button>
                 )}
               </div>

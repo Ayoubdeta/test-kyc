@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { documentsApi } from '../api/documents.api';
+import { useI18n } from '../i18n';
+import { docTypeLabel } from '../i18n/labels';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import type { DocumentItem } from '../types';
 import { DocumentTimeline } from './DocumentTimeline';
@@ -10,6 +12,7 @@ const DOCS_KEY = ['documents', 'mine'] as const;
 // Panel del cliente: los 7 documentos requeridos, cada uno con una línea de
 // tiempo que muestra en qué fase del flujo KYC se encuentra.
 export function ClientDocumentsSummary() {
+  const { t } = useI18n();
   const { data: documents = [], isLoading } = useQuery({
     queryKey: DOCS_KEY,
     queryFn: documentsApi.listMine,
@@ -28,23 +31,23 @@ export function ClientDocumentsSummary() {
     <section className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-slate-800">Estado de mis documentos</h2>
-          <p className="text-sm text-slate-500">Sigue cada documento a lo largo del proceso.</p>
+          <h2 className="text-base font-semibold text-slate-800">{t('summary.title')}</h2>
+          <p className="text-sm text-slate-500">{t('summary.subtitle')}</p>
         </div>
         <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
-          {approvedCount} / {DOCUMENT_TYPES.length} aprobados
+          {t('dashboard.approvedOf', { approved: approvedCount, total: DOCUMENT_TYPES.length })}
         </span>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Cargando…</p>
+        <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-3">
           {DOCUMENT_TYPES.map((type) => (
             <DocumentTimeline
               key={type.key}
               docType={type.key}
-              label={type.label}
+              label={docTypeLabel(t, type.key)}
               doc={byType.get(type.key)}
             />
           ))}
@@ -55,7 +58,7 @@ export function ClientDocumentsSummary() {
         to="/documents"
         className="mt-4 inline-flex text-sm font-medium text-brand-600 transition hover:text-brand-700"
       >
-        Gestionar documentos →
+        {t('summary.manage')}
       </Link>
     </section>
   );

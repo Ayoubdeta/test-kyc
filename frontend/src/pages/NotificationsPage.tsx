@@ -4,11 +4,13 @@ import { notificationsApi } from '../api/notifications.api';
 import { LIST_KEY, UNREAD_KEY } from '../components/NotificationBell';
 import { NotificationIcon } from '../components/icons';
 import { Button } from '../components/ui/Button';
+import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { notificationHref } from '../lib/documents';
 import { formatDateTime } from '../lib/format';
 
 export function NotificationsPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const { data: notifications = [], isLoading } = useQuery({
@@ -37,21 +39,21 @@ export function NotificationsPage() {
     <DashboardLayout>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Notificaciones</h1>
-          <p className="text-sm text-slate-500">Avisos sobre el estado de tus documentos.</p>
+          <h1 className="text-xl font-bold text-slate-900">{t('notif.title')}</h1>
+          <p className="text-sm text-slate-500">{t('notif.pageSubtitle')}</p>
         </div>
         {hasUnread && (
           <Button variant="ghost" onClick={() => markAll.mutate()} isLoading={markAll.isPending}>
-            Marcar todas como leídas
+            {t('notif.markAll')}
           </Button>
         )}
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Cargando…</p>
+        <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : notifications.length === 0 ? (
         <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
-          <p className="mt-2 text-sm text-slate-500">No tienes notificaciones.</p>
+          <p className="mt-2 text-sm text-slate-500">{t('notif.empty')}</p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -74,14 +76,14 @@ export function NotificationsPage() {
                     {!n.read && (
                       <span
                         className="h-2 w-2 rounded-full bg-brand-600"
-                        aria-label="No leída"
+                        aria-label={t('notif.unreadAria')}
                       />
                     )}
                     <button
                       type="button"
                       onClick={() => remove.mutate(n.id)}
                       className="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-red-600"
-                      aria-label="Borrar notificación"
+                      aria-label={t('notif.deleteAria')}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

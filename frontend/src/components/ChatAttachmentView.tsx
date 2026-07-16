@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { chatApi } from '../api/chat.api';
+import { useI18n } from '../i18n';
 import { formatBytes } from '../lib/format';
 import type { ChatAttachment } from '../types';
 import { FileTextIcon } from './icons';
@@ -13,6 +14,7 @@ interface Props {
 // Muestra el adjunto de un mensaje. La descarga va por axios (cookies de
 // sesión) y se expone como object URL; por eso liberamos la URL al desmontar.
 export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
+  const { t } = useI18n();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -58,14 +60,14 @@ export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
       <button
         type="button"
         onClick={download}
-        title="Descargar imagen"
+        title={t('chat.downloadImage')}
         className="mt-1 block overflow-hidden rounded-lg border border-black/10"
       >
         {imageUrl ? (
           <img src={imageUrl} alt={attachment.name} className="max-h-52 max-w-full object-cover" />
         ) : (
           <div className="flex h-24 w-40 items-center justify-center bg-black/5 text-xs text-slate-400">
-            Cargando imagen…
+            {t('chat.loadingImage')}
           </div>
         )}
       </button>
@@ -87,7 +89,7 @@ export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
       <span className="min-w-0">
         <span className="block max-w-[12rem] truncate font-medium">{attachment.name}</span>
         <span className={mine ? 'text-white/70' : 'text-slate-400'}>
-          {downloading ? 'Descargando…' : formatBytes(attachment.size)}
+          {downloading ? t('chat.downloading') : formatBytes(attachment.size)}
         </span>
       </span>
     </button>

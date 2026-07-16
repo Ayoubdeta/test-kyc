@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { adminApi, type ClientType, type CreateClientResult } from '../api/admin.api';
 import { getApiErrorMessage } from '../api/client';
+import { useI18n } from '../i18n';
 import { Alert } from './ui/Alert';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -9,13 +10,10 @@ import { TextField } from './ui/TextField';
 
 const USERS_KEY = ['admin', 'users'] as const;
 
-const CLIENT_TYPES: { value: ClientType; label: string }[] = [
-  { value: 'empresa', label: 'Empresa' },
-  { value: 'autonomo', label: 'Autónomo' },
-  { value: 'particular', label: 'Particular' },
-];
+const CLIENT_TYPE_VALUES: ClientType[] = ['empresa', 'autonomo', 'particular'];
 
 export function CreateClientModal({ onClose }: { onClose: () => void }) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [values, setValues] = useState({
     razonSocial: '',
@@ -38,7 +36,7 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
       setResult(data);
       await queryClient.invalidateQueries({ queryKey: USERS_KEY });
     },
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo crear el cliente')),
+    onError: (err) => setError(getApiErrorMessage(err, t('cc.errCreate'))),
   });
 
   const activationLink = result
@@ -51,7 +49,7 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError('No se pudo copiar automáticamente; copia el enlace manualmente.');
+      setError(t('cc.copyError'));
     }
   };
 
@@ -62,16 +60,15 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open title="Crear cliente" onClose={onClose}>
+    <Modal open title={t('cc.title')} onClose={onClose}>
       {result ? (
         // Éxito: mostramos el enlace de activación para compartirlo.
         <div className="flex flex-col gap-4">
           <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">
-            Cliente creado. Estado del expediente: <strong>Pendiente de completar</strong>. Comparte
-            este enlace con el cliente para que active su cuenta:
+            {t('cc.createdLead')} <strong>{t('cc.expedientePending')}</strong>. {t('cc.createdShare')}
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-slate-500">Enlace de activación</label>
+            <label className="text-xs font-medium text-slate-500">{t('cc.activationLink')}</label>
             <div className="flex gap-2">
               <input
                 readOnly
@@ -80,13 +77,13 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
                 className="flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none"
               />
               <Button variant="ghost" onClick={copyLink}>
-                {copied ? 'Copiado' : 'Copiar'}
+                {copied ? t('cc.copied') : t('cc.copy')}
               </Button>
             </div>
-            <p className="text-xs text-slate-400">El enlace caduca en 7 días.</p>
+            <p className="text-xs text-slate-400">{t('cc.linkExpires')}</p>
           </div>
           <div className="flex justify-end">
-            <Button onClick={onClose}>Hecho</Button>
+            <Button onClick={onClose}>{t('cc.done')}</Button>
           </div>
         </div>
       ) : (
@@ -94,16 +91,16 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
           {error && <Alert>{error}</Alert>}
 
           <TextField
-            label="Razón social"
+            label={t('cc.razonSocial')}
             name="razonSocial"
             value={values.razonSocial}
             onChange={set('razonSocial')}
           />
-          <TextField label="CIF / NIF" name="cif" value={values.cif} onChange={set('cif')} />
+          <TextField label={t('cc.cif')} name="cif" value={values.cif} onChange={set('cif')} />
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="clientType" className="text-sm font-medium text-slate-700">
-              Tipo de cliente
+              {t('cc.clientType')}
             </label>
             <select
               id="clientType"
@@ -111,22 +108,22 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
               onChange={set('clientType')}
               className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
-              {CLIENT_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
+              {CLIENT_TYPE_VALUES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {t(`clientType.${ct}`)}
                 </option>
               ))}
             </select>
           </div>
 
           <TextField
-            label="Comercial asignado (opcional)"
+            label={t('cc.comercial')}
             name="comercialAsignado"
             value={values.comercialAsignado}
             onChange={set('comercialAsignado')}
           />
           <TextField
-            label="Email principal del cliente"
+            label={t('cc.email')}
             name="email"
             type="email"
             value={values.email}
@@ -135,10 +132,10 @@ export function CreateClientModal({ onClose }: { onClose: () => void }) {
 
           <div className="flex justify-end gap-3">
             <Button variant="ghost" onClick={onClose} type="button">
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit" isLoading={create.isPending}>
-              Crear cliente
+              {t('cc.create')}
             </Button>
           </div>
         </form>

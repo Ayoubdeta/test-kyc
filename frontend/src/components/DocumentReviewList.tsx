@@ -3,7 +3,8 @@ import { useMemo, useState } from 'react';
 import { getApiErrorMessage } from '../api/client';
 import { documentsApi, type DecisionPayload } from '../api/documents.api';
 import { usePdfPreview } from '../hooks/usePdfPreview';
-import { documentTypeLabel } from '../lib/documents';
+import { useI18n } from '../i18n';
+import { docTypeLabel } from '../i18n/labels';
 import { formatBytes, formatDate, formatDateTime } from '../lib/format';
 import type { DocumentItem } from '../types';
 import { StatusBadge } from './Badge';
@@ -15,12 +16,7 @@ import { TextArea } from './ui/TextArea';
 
 export const DOCS_ALL_KEY = ['documents', 'all'] as const;
 
-const VALIDITY_OPTIONS = [
-  { months: 6, label: '6 meses' },
-  { months: 12, label: '12 meses' },
-  { months: 24, label: '24 meses' },
-  { months: 36, label: '36 meses' },
-];
+const VALIDITY_MONTHS = [6, 12, 24, 36];
 
 interface UserGroup {
   ownerId: string;
@@ -58,8 +54,9 @@ export function DocumentReviewList({
   allowReviewActions,
   allowDecision,
   isLoading = false,
-  emptyText = 'No hay documentos.',
+  emptyText,
 }: Props) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const preview = usePdfPreview();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -78,7 +75,7 @@ export function DocumentReviewList({
   const startReview = useMutation({
     mutationFn: (id: string) => documentsApi.startReview(id),
     onSuccess: invalidate,
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo poner en revisión')),
+    onError: (err) => setError(getApiErrorMessage(err, t('list.errStartReview'))),
   });
 
   // Decisión de compliance/admin sobre un documento en revisión.
@@ -92,7 +89,7 @@ export function DocumentReviewList({
       setReviewTarget(null);
       setReviewComment('');
     },
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo completar la revisión')),
+    onError: (err) => setError(getApiErrorMessage(err, t('list.errReview'))),
   });
 
   const decisionMutation = useMutation({
@@ -103,7 +100,7 @@ export function DocumentReviewList({
       setDecisionTarget(null);
       setDecisionComment('');
     },
-    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo guardar la decisión')),
+    onError: (err) => setError(getApiErrorMessage(err, t('list.errDecision'))),
   });
 
   const handleView = (doc: DocumentItem) => {
@@ -183,7 +180,7 @@ export function DocumentReviewList({
   };
 
   if (isLoading) {
-    return <p className="text-sm text-slate-500">Cargando…</p>;
+    return <p className="text-sm text-slate-500">{t('common.loading')}</p>;
   }
 
   if (groups.length === 0) {
@@ -192,7 +189,7 @@ export function DocumentReviewList({
         <p className="text-3xl" aria-hidden="true">
           🗂️
         </p>
-        <p className="mt-2 text-sm text-slate-500">{emptyText}</p>
+        <p className="mt-2 text-sm text-slate-500">{emptyText ?? t('list.empty')}</p>
       </div>
     );
   }
@@ -226,23 +223,23 @@ export function DocumentReviewList({
                 <div className="flex items-center gap-2 text-xs">
                   {g.pending > 0 && (
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
-                      {g.pending} pendiente{g.pending === 1 ? '' : 's'}
+                      {t('list.pending', { n: g.pending })}
                     </span>
                   )}
                   {g.inReview > 0 && (
                     <span className="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">
-                      {g.inReview} en revisión
+                      {t('list.inReviewCount', { n: g.inReview })}
                     </span>
                   )}
                   {g.pendingApproval > 0 && (
                     <span className="rounded-full bg-indigo-100 px-2 py-0.5 font-semibold text-indigo-700">
-                      {g.pendingApproval} por aprobar
+                      {t('list.pendingApprovalCount', { n: g.pendingApproval })}
                     </span>
                   )}
                   <span className="rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
-                    {g.approved} aprobado{g.approved === 1 ? '' : 's'}
+                    {t('list.approvedCount', { n: g.approved })}
                   </span>
-                  <span className="text-slate-400">{g.docs.length} docs</span>
+                  <span className="text-slate-400">{t('list.docsCount', { n: g.docs.length })}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -265,7 +262,7 @@ export function DocumentReviewList({
                     <li key={doc.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-slate-800">
-                          {documentTypeLabel(doc.docType)}
+                          {docTypeLabel(t, doc.docType)}
                         </p>
                         <p className="truncate text-xs text-slate-500">
                           {doc.originalName} · {formatBytes(doc.sizeBytes)} ·{' '}
@@ -273,12 +270,12 @@ export function DocumentReviewList({
                         </p>
                         {doc.status === 'aprobado' && doc.expiresAt && (
                           <p className="text-xs text-green-700">
-                            Válido hasta el {formatDate(doc.expiresAt)}
+                            {t('docs.validUntil', { date: formatDate(doc.expiresAt) })}
                           </p>
                         )}
                         {doc.status === 'caducado' && (
                           <p className="text-xs text-amber-700">
-                            Caducó el {formatDate(doc.expiresAt)}
+                            {t('list.expiredOn', { date: formatDate(doc.expiresAt) })}
                           </p>
                         )}
                         {(doc.status === 'rechazado' ||
@@ -291,7 +288,7 @@ export function DocumentReviewList({
                       <StatusBadge status={doc.status} />
                       <div className="flex flex-wrap gap-2">
                         <Button variant="ghost" onClick={() => handleView(doc)}>
-                          Ver
+                          {t('common.view')}
                         </Button>
                         {allowReviewActions && doc.status === 'en_revision' && (
                           <>
@@ -299,20 +296,20 @@ export function DocumentReviewList({
                               variant="primary"
                               onClick={() => openReview(doc, 'enviar_aprobacion')}
                             >
-                              Enviar a aprobación
+                              {t('list.sendApproval')}
                             </Button>
                             <Button variant="danger" onClick={() => openReview(doc, 'cancelar')}>
-                              Cancelar
+                              {t('common.cancel')}
                             </Button>
                           </>
                         )}
                         {allowDecision && doc.status === 'pendiente_aprobacion' && (
                           <>
                             <Button variant="success" onClick={() => openDecision(doc, 'aprobado')}>
-                              Aprobar
+                              {t('list.approve')}
                             </Button>
                             <Button variant="danger" onClick={() => openDecision(doc, 'rechazado')}>
-                              Rechazar
+                              {t('list.reject')}
                             </Button>
                           </>
                         )}
@@ -330,27 +327,27 @@ export function DocumentReviewList({
       <Modal
         open={reviewTarget !== null}
         title={
-          reviewTarget?.action === 'cancelar' ? 'Cancelar documento' : 'Enviar a aprobación'
+          reviewTarget?.action === 'cancelar' ? t('list.cancelDocTitle') : t('list.sendApproval')
         }
         onClose={() => setReviewTarget(null)}
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm text-slate-600">
-            {documentTypeLabel(reviewTarget?.doc.docType ?? null)} ·{' '}
+            {docTypeLabel(t, reviewTarget?.doc.docType ?? null)} ·{' '}
             {reviewTarget?.doc.owner?.email}
           </p>
 
           <p className="text-sm text-slate-500">
             {reviewTarget?.action === 'cancelar'
-              ? 'El documento quedará rechazado y se avisará al cliente con el motivo para que lo vuelva a enviar corregido.'
-              : 'El documento pasará a estar pendiente de aprobación por Dirección General.'}
+              ? t('list.cancelDesc')
+              : t('list.sendApprovalDesc')}
           </p>
 
           <TextArea
             label={
               reviewTarget?.action === 'cancelar'
-                ? 'Motivo (recomendado)'
-                : 'Comentario (opcional)'
+                ? t('list.reasonRecommended')
+                : t('list.commentOptional')
             }
             name="reviewComment"
             value={reviewComment}
@@ -359,14 +356,14 @@ export function DocumentReviewList({
 
           <div className="flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setReviewTarget(null)}>
-              Volver
+              {t('list.back')}
             </Button>
             <Button
               variant={reviewTarget?.action === 'cancelar' ? 'danger' : 'primary'}
               onClick={confirmReview}
               isLoading={reviewMutation.isPending}
             >
-              {reviewTarget?.action === 'cancelar' ? 'Cancelar documento' : 'Enviar a aprobación'}
+              {reviewTarget?.action === 'cancelar' ? t('list.cancelDocTitle') : t('list.sendApproval')}
             </Button>
           </div>
         </div>
@@ -375,19 +372,19 @@ export function DocumentReviewList({
       {/* Modal: decisión de Dirección */}
       <Modal
         open={decisionTarget !== null}
-        title={decisionTarget?.status === 'aprobado' ? 'Aprobar documento' : 'Rechazar documento'}
+        title={decisionTarget?.status === 'aprobado' ? t('list.approveDocTitle') : t('list.rejectDocTitle')}
         onClose={() => setDecisionTarget(null)}
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm text-slate-600">
-            {documentTypeLabel(decisionTarget?.doc.docType ?? null)} ·{' '}
+            {docTypeLabel(t, decisionTarget?.doc.docType ?? null)} ·{' '}
             {decisionTarget?.doc.owner?.email}
           </p>
 
           {decisionTarget?.status === 'aprobado' && (
             <div className="flex flex-col gap-1.5">
               <label htmlFor="validity" className="text-sm font-medium text-slate-700">
-                Validez del documento
+                {t('list.validity')}
               </label>
               <select
                 id="validity"
@@ -395,9 +392,9 @@ export function DocumentReviewList({
                 value={validityMonths}
                 onChange={(e) => setValidityMonths(Number(e.target.value))}
               >
-                {VALIDITY_OPTIONS.map((opt) => (
-                  <option key={opt.months} value={opt.months}>
-                    {opt.label}
+                {VALIDITY_MONTHS.map((months) => (
+                  <option key={months} value={months}>
+                    {t('list.months', { n: months })}
                   </option>
                 ))}
               </select>
@@ -407,8 +404,8 @@ export function DocumentReviewList({
           <TextArea
             label={
               decisionTarget?.status === 'rechazado'
-                ? 'Motivo (recomendado)'
-                : 'Comentario (opcional)'
+                ? t('list.reasonRecommended')
+                : t('list.commentOptional')
             }
             name="decisionComment"
             value={decisionComment}
@@ -417,14 +414,14 @@ export function DocumentReviewList({
 
           <div className="flex justify-end gap-3">
             <Button variant="ghost" onClick={() => setDecisionTarget(null)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               variant={decisionTarget?.status === 'aprobado' ? 'success' : 'danger'}
               onClick={confirmDecision}
               isLoading={decisionMutation.isPending}
             >
-              {decisionTarget?.status === 'aprobado' ? 'Aprobar' : 'Rechazar'}
+              {decisionTarget?.status === 'aprobado' ? t('list.approve') : t('list.reject')}
             </Button>
           </div>
         </div>

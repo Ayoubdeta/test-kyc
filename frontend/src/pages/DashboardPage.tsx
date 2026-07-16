@@ -3,6 +3,7 @@ import { Avatar } from '../components/Avatar';
 import { ClientDashboard } from '../components/ClientDashboard';
 import { StaffKpiOverview } from '../components/StaffKpiOverview';
 import { displayValue, formatDate, formatDateTime } from '../lib/format';
+import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { canApprove, isStaff } from '../lib/roles';
@@ -46,6 +47,7 @@ function InfoCard({ title, children }: { title: string; children: React.ReactNod
 
 export function DashboardPage() {
   const { me } = useAuth();
+  const { t } = useI18n();
 
   // ProtectedRoute garantiza que hay sesión; esta guarda es por seguridad de tipos.
   if (!me) {
@@ -72,18 +74,16 @@ export function DashboardPage() {
           <Avatar src={profile.avatarUrl} name={displayName} size="md" />
           <div>
             <h1 className="text-xl font-bold text-slate-900">
-              Hola, {displayValue(profile.fullName ?? user.username)}
+              {t('staffDash.hello', { name: displayValue(profile.fullName ?? user.username) })}
             </h1>
-            <p className="text-sm text-slate-500">
-              Este es tu panel. Aquí tienes la información de tu cuenta.
-            </p>
+            <p className="text-sm text-slate-500">{t('staffDash.subtitle')}</p>
           </div>
         </div>
         <Link
           to="/settings"
           className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
         >
-          Configurar cuenta
+          {t('nav.settings')}
         </Link>
       </div>
 
@@ -95,61 +95,61 @@ export function DashboardPage() {
         {isStaff(user.role) && (
           <QuickLink
             to="/review"
-            title="Documentos por usuario"
+            title={t('staffDash.qlDocsTitle')}
             description={
               canApprove(user.role)
-                ? 'Consulta los documentos de cada cliente y decide sobre los que están en revisión.'
-                : 'Consulta los documentos de cada cliente y envíalos a Dirección.'
+                ? t('staffDash.qlDocsDescApprove')
+                : t('staffDash.qlDocsDescReview')
             }
           />
         )}
         {canApprove(user.role) && (
           <QuickLink
             to="/approvals"
-            title="Pendientes de aprobar"
-            description="Documentos revisados que esperan tu aprobación."
+            title={t('staffDash.qlApprovalsTitle')}
+            description={t('staffDash.qlApprovalsDesc')}
           />
         )}
         {isStaff(user.role) && (
           <QuickLink
             to="/kpis"
-            title="KPIs"
-            description="Analiza los documentos con filtros por fecha, tipo y estado."
+            title={t('staffDash.qlKpisTitle')}
+            description={t('staffDash.qlKpisDesc')}
           />
         )}
         {user.role === 'admin' && (
           <QuickLink
             to="/users"
-            title="Usuarios"
-            description="Gestiona los roles de los usuarios."
+            title={t('staffDash.qlUsersTitle')}
+            description={t('staffDash.qlUsersDesc')}
           />
         )}
         <QuickLink
           to="/settings"
-          title="Configurar cuenta"
-          description="Actualiza tu foto y tus datos personales."
+          title={t('staffDash.qlSettingsTitle')}
+          description={t('staffDash.qlSettingsDesc')}
         />
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <InfoCard title="Cuenta">
-          <InfoRow label="Usuario" value={user.username} />
-          <InfoRow label="Email" value={user.email} />
-          <InfoRow label="Miembro desde" value={formatDate(user.createdAt)} />
-          <InfoRow label="Último acceso" value={formatDateTime(user.lastLoginAt)} />
+        <InfoCard title={t('staffDash.accountTitle')}>
+          <InfoRow label={t('dashboard.username')} value={user.username} />
+          <InfoRow label={t('dashboard.email')} value={user.email} />
+          <InfoRow label={t('dashboard.memberSince')} value={formatDate(user.createdAt)} />
+          <InfoRow label={t('staffDash.lastAccess')} value={formatDateTime(user.lastLoginAt)} />
         </InfoCard>
 
-        <InfoCard title="Perfil">
-          <InfoRow label="Nombre completo" value={displayValue(profile.fullName)} />
-          <InfoRow label="Teléfono" value={displayValue(profile.phone)} />
-          <InfoRow label="Dirección" value={displayValue(profile.address)} />
-          <InfoRow label="Fecha de nacimiento" value={formatDate(profile.birthDate)} />
+        <InfoCard title={t('staffDash.profileTitle')}>
+          <InfoRow label={t('dashboard.fullName')} value={displayValue(profile.fullName)} />
+          <InfoRow label={t('dashboard.phone')} value={displayValue(profile.phone)} />
+          <InfoRow label={t('dashboard.address')} value={displayValue(profile.address)} />
+          <InfoRow label={t('staffDash.birthDate')} value={formatDate(profile.birthDate)} />
         </InfoCard>
       </div>
 
       {profile.bio && (
         <div className="mt-5">
-          <InfoCard title="Biografía">
+          <InfoCard title={t('staffDash.bioTitle')}>
             <p className="py-1 text-sm leading-relaxed text-slate-700">{profile.bio}</p>
           </InfoCard>
         </div>

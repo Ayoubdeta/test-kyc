@@ -1,19 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminApi } from '../api/admin.api';
-import { EVENT_META, documentTypeLabel } from '../lib/documents';
+import { useI18n } from '../i18n';
+import { docTypeLabel, eventLabel } from '../i18n/labels';
+import { EVENT_META } from '../lib/documents';
 import { formatDate, formatDateTime } from '../lib/format';
 import { EventIcon } from './icons';
 
 // Historial de eventos de documentos de un usuario (panel de administración).
 export function UserHistoryPanel({ userId }: { userId: string }) {
+  const { t } = useI18n();
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['admin', 'user-history', userId],
     queryFn: () => adminApi.getUserHistory(userId),
   });
 
-  if (isLoading) return <p className="py-6 text-sm text-slate-500">Cargando…</p>;
+  if (isLoading) return <p className="py-6 text-sm text-slate-500">{t('common.loading')}</p>;
   if (events.length === 0) {
-    return <p className="py-6 text-sm text-slate-500">Sin actividad registrada.</p>;
+    return <p className="py-6 text-sm text-slate-500">{t('panel.noActivity')}</p>;
   }
 
   return (
@@ -30,17 +33,19 @@ export function UserHistoryPanel({ userId }: { userId: string }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <EventIcon type={ev.eventType} className="h-4 w-4 text-slate-500" />
-                  <span className="text-sm font-semibold text-slate-800">{meta.label}</span>
-                  <span className="text-sm text-slate-500">· {documentTypeLabel(ev.docType)}</span>
+                  <span className="text-sm font-semibold text-slate-800">{eventLabel(t, ev.eventType)}</span>
+                  <span className="text-sm text-slate-500">· {docTypeLabel(t, ev.docType)}</span>
                 </div>
                 <span className="text-xs text-slate-400">{formatDateTime(ev.createdAt)}</span>
               </div>
               {ev.eventType === 'aprobado' && ev.expiresAt && (
-                <p className="mt-1 text-xs text-green-700">Válido hasta el {formatDate(ev.expiresAt)}</p>
+                <p className="mt-1 text-xs text-green-700">
+                  {t('docs.validUntil', { date: formatDate(ev.expiresAt) })}
+                </p>
               )}
               {ev.eventType === 'rechazado' && (
                 <p className="mt-1 text-xs text-red-600">
-                  {ev.comment ? `Motivo: ${ev.comment}` : 'Sin motivo indicado'}
+                  {ev.comment ? `${t('common.reason')}: ${ev.comment}` : t('history.noReason')}
                 </p>
               )}
             </div>

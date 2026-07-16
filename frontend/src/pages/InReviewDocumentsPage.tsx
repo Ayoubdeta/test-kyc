@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { documentsApi } from '../api/documents.api';
 import { DocumentReviewList, DOCS_ALL_KEY } from '../components/DocumentReviewList';
+import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 
 // Documentos que compliance/admin están revisando. Desde aquí deciden
 // enviarlos a aprobación de Dirección o cancelarlos.
 export function InReviewDocumentsPage() {
+  const { t } = useI18n();
   const { data: documents = [], isLoading } = useQuery({
     queryKey: DOCS_ALL_KEY,
     queryFn: documentsApi.listAll,
@@ -16,11 +18,8 @@ export function InReviewDocumentsPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">Documentos en revisión</h1>
-        <p className="text-sm text-slate-500">
-          Documentos que estás revisando. Envíalos a aprobación de Dirección o cancélalos
-          para que el cliente los reenvíe.
-        </p>
+        <h1 className="text-xl font-bold text-slate-900">{t('review.inReviewTitle')}</h1>
+        <p className="text-sm text-slate-500">{t('review.inReviewSubtitle')}</p>
       </div>
 
       <DocumentReviewList
@@ -28,7 +27,7 @@ export function InReviewDocumentsPage() {
         isLoading={isLoading}
         allowReviewActions
         allowDecision={false}
-        emptyText="No hay documentos en revisión."
+        emptyText={t('review.emptyInReview')}
       />
     </DashboardLayout>
   );

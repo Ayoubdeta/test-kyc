@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { chatApi, type SendPayload } from '../api/chat.api';
 import { useChatStream } from '../hooks/useChatStream';
+import { useI18n } from '../i18n';
 import type { ChatStreamEvent } from '../types';
 import { ChatThread } from './ChatThread';
 
@@ -10,6 +11,7 @@ const UNREAD_KEY = ['chat', 'me', 'unread'] as const;
 
 // Chat flotante para el cliente (esquina inferior derecha).
 export function ChatWidget() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [typingLabel, setTypingLabel] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function ChatWidget() {
   const onEvent = useCallback(
     (ev: ChatStreamEvent) => {
       if (ev.type === 'typing') {
-        setTypingLabel('El equipo de soporte está escribiendo…');
+        setTypingLabel(t('chat.teamTyping'));
         clearTimeout(typingTimer.current);
         typingTimer.current = setTimeout(() => setTypingLabel(null), 3000);
         return;
@@ -40,7 +42,7 @@ export function ChatWidget() {
       void queryClient.invalidateQueries({ queryKey: UNREAD_KEY });
       if (open) void queryClient.invalidateQueries({ queryKey: MESSAGES_KEY });
     },
-    [open, queryClient],
+    [open, queryClient, t],
   );
   useChatStream(onEvent);
 
@@ -77,13 +79,13 @@ export function ChatWidget() {
         <div className="mb-3 flex h-[30rem] w-[23rem] max-w-[calc(100vw-2.5rem)] animate-scale-in flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevated">
           <div className="flex items-center justify-between bg-gradient-to-r from-brand-700 to-brand-600 px-4 py-3 text-white">
             <div>
-              <p className="text-sm font-semibold">Soporte KYC</p>
-              <p className="text-[11px] text-white/80">Escríbenos, te responderemos pronto</p>
+              <p className="text-sm font-semibold">{t('chat.widgetTitle')}</p>
+              <p className="text-[11px] text-white/80">{t('chat.widgetSubtitle')}</p>
             </div>
             <button
               onClick={() => setOpen(false)}
               className="rounded-md p-1 text-white/90 hover:bg-white/10"
-              aria-label="Cerrar chat"
+              aria-label={t('chat.closeChat')}
             >
               ✕
             </button>
@@ -108,7 +110,7 @@ export function ChatWidget() {
         type="button"
         onClick={() => (open ? setOpen(false) : openChat())}
         className="relative flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-elevated transition hover:bg-brand-700"
-        aria-label="Abrir chat de soporte"
+        aria-label={t('chat.openChat')}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { notificationsApi } from '../api/notifications.api';
+import { useI18n } from '../i18n';
 import { notificationHref } from '../lib/documents';
 import { formatDateTime } from '../lib/format';
 import { NotificationIcon } from './icons';
@@ -15,6 +16,7 @@ const PREVIEW_LIMIT = 6;
 // Campana de notificaciones: muestra el contador de no leídas y, al pulsarla,
 // despliega un panel con las últimas notificaciones (con opción de borrarlas).
 export function NotificationBell() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -76,7 +78,9 @@ export function NotificationBell() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="relative flex h-9 w-9 items-center justify-center rounded-lg text-white/90 transition hover:bg-white/10"
-        aria-label={`Notificaciones${count > 0 ? ` (${count} sin leer)` : ''}`}
+        aria-label={
+          count > 0 ? `${t('notif.title')} (${t('notif.unreadCount', { count })})` : t('notif.title')
+        }
         aria-expanded={open}
       >
         <svg
@@ -103,7 +107,7 @@ export function NotificationBell() {
       {open && (
         <div className="absolute right-0 z-40 mt-2 w-80 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <span className="text-sm font-semibold text-slate-800">Notificaciones</span>
+            <span className="text-sm font-semibold text-slate-800">{t('notif.title')}</span>
             {notifications.some((n) => !n.read) && (
               <button
                 type="button"
@@ -111,17 +115,17 @@ export function NotificationBell() {
                 className="text-xs font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50"
                 disabled={markAll.isPending}
               >
-                Marcar leídas
+                {t('notif.markRead')}
               </button>
             )}
           </div>
 
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-6 text-center text-sm text-slate-500">Cargando…</p>
+              <p className="px-4 py-6 text-center text-sm text-slate-500">{t('common.loading')}</p>
             ) : preview.length === 0 ? (
               <p className="px-4 py-8 text-center text-sm text-slate-500">
-                No tienes notificaciones.
+                {t('notif.empty')}
               </p>
             ) : (
               <ul className="divide-y divide-slate-100">
@@ -151,7 +155,7 @@ export function NotificationBell() {
                       type="button"
                       onClick={() => remove.mutate(n.id)}
                       className="shrink-0 self-start rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-red-600"
-                      aria-label="Borrar notificación"
+                      aria-label={t('notif.deleteAria')}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +182,7 @@ export function NotificationBell() {
             onClick={() => setOpen(false)}
             className="block border-t border-slate-100 px-4 py-2.5 text-center text-sm font-medium text-brand-600 transition hover:bg-slate-50"
           >
-            Ver todas
+            {t('notif.viewAll')}
           </Link>
         </div>
       )}
