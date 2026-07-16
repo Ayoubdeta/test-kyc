@@ -131,3 +131,4 @@ Abre **http://localhost:5173**.
 
 **Backend** (`backend/`): `npm run dev` · `npm run build` · `npm start` · `npm run typecheck`
 **Frontend** (`frontend/`): `npm run dev` · `npm run build` · `npm run preview` · `npm run typecheck`
+# test-kyc
