@@ -1,0 +1,130 @@
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getApiErrorMessage } from '../api/client';
+import { useAuth } from '../hooks/useAuth';
+import { Avatar } from './Avatar';
+import { RoleBadge } from './Badge';
+import { LogOutIcon, SettingsIcon } from './icons';
+
+// Menú de usuario en la cabecera: al pulsar el avatar o el nombre se despliega
+// un panel con los datos de la cuenta, acceso a configurar el perfil y salir.
+// Disponible para todos los roles (cliente y personal interno).
+export function UserMenu() {
+  const { me, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Cierra el menú al hacer clic fuera o pulsar Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  if (!me) return null;
+
+  const { user, profile } = me;
+  const displayName = profile.fullName ?? user.username;
+
+  const handleLogout = async () => {
+    setError(null);
+    setLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No se pudo cerrar sesión'));
+      setLoggingOut(false);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 text-white/90 transition hover:bg-white/10"
+        aria-label="Abrir menú de usuario"
+        aria-expanded={open}
+      >
+        <Avatar src={profile.avatarUrl} name={displayName} size="sm" />
+        <span className="hidden max-w-[9rem] truncate text-sm font-medium sm:inline">
+          {user.username}
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`h-4 w-4 text-white/70 transition-transform ${open ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-40 mt-2 w-72 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
+          {/* Cabecera con la identidad del usuario */}
+          <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-4">
+            <Avatar src={profile.avatarUrl} name={displayName} size="sm" />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-800">{displayName}</p>
+              <p className="truncate text-xs text-slate-500">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
+            <span className="text-xs text-slate-500">Rol</span>
+            <RoleBadge role={user.role} />
+          </div>
+
+          {/* Acciones */}
+          <div className="p-1.5">
+            <Link
+              to="/settings"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            >
+              <SettingsIcon className="h-4 w-4 text-slate-500" />
+              Configurar perfil
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+            >
+              <LogOutIcon className="h-4 w-4" />
+              {loggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+            </button>
+          </div>
+
+          {error && (
+            <p className="border-t border-slate-100 px-4 py-2 text-xs text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

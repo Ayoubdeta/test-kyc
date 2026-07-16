@@ -1,0 +1,28 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (¡nunca versionar secretos!)
+.env
+.env.*
+!.env.example
+*.local
+
+# Ficheros subidos en local (KYC + adjuntos de chat)
+uploads/
+
+# Vercel
+.vercel
+
+# Builds
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / SO
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/

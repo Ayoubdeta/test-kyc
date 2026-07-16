@@ -1,0 +1,352 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { adminApi, type AdminUpdateUserPayload } from '../api/admin.api';
+import { getApiErrorMessage } from '../api/client';
+import { ALL_ROLES, ROLE_LABELS } from '../lib/roles';
+import { adminUserSchema, resetPasswordSchema } from '../validators/adminUser';
+import type { Role } from '../types';
+import { Alert } from './ui/Alert';
+import { Button } from './ui/Button';
+import { TextArea } from './ui/TextArea';
+import { TextField } from './ui/TextField';
+import { UserDocumentsPanel } from './UserDocumentsPanel';
+import { UserHistoryPanel } from './UserHistoryPanel';
+
+type Tab = 'cuenta' | 'documentos' | 'historial';
+
+interface Props {
+  userId: string;
+  isSelf: boolean;
+  onClose: () => void;
+}
+
+type FormValues = {
+  username: string;
+  email: string;
+  role: Role;
+  fullName: string;
+  phone: string;
+  address: string;
+  birthDate: string;
+  bio: string;
+};
+
+type FieldErrors = Partial<Record<keyof FormValues, string>>;
+
+const EMPTY: FormValues = {
+  username: '',
+  email: '',
+  role: 'cliente',
+  fullName: '',
+  phone: '',
+  address: '',
+  birthDate: '',
+  bio: '',
+};
+
+export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
+  const queryClient = useQueryClient();
+
+  const [values, setValues] = useState<FormValues>(EMPTY);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [tab, setTab] = useState<Tab>('cuenta');
+
+  // Carga los datos actuales del usuario para prefill.
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin', 'user', userId],
+    queryFn: () => adminApi.getUser(userId),
+  });
+
+  useEffect(() => {
+    if (data) {
+      setValues({
+        username: data.user.username,
+        email: data.user.email,
+        role: data.user.role,
+        fullName: data.profile.fullName ?? '',
+        phone: data.profile.phone ?? '',
+        address: data.profile.address ?? '',
+        birthDate: data.profile.birthDate ?? '',
+        bio: data.profile.bio ?? '',
+      });
+    }
+  }, [data]);
+
+  const invalidateUsers = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    if (isSelf) await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+  };
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: AdminUpdateUserPayload) => adminApi.updateUser(userId, payload),
+    onSuccess: async () => {
+      await invalidateUsers();
+      setSuccess('Cambios guardados.');
+    },
+    onError: (err) => setError(getApiErrorMessage(err, 'No se pudieron guardar los cambios')),
+  });
+
+  const passwordMutation = useMutation({
+    mutationFn: (password: string) => adminApi.resetPassword(userId, password),
+    onSuccess: () => {
+      setNewPassword('');
+      setSuccess('Contraseña restablecida. Se han cerrado las sesiones del usuario.');
+    },
+    onError: (err) => setPasswordError(getApiErrorMessage(err, 'No se pudo restablecer')),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => adminApi.deleteUser(userId),
+    onSuccess: async () => {
+      await invalidateUsers();
+      onClose();
+    },
+    onError: (err) => setError(getApiErrorMessage(err, 'No se pudo eliminar el usuario')),
+  });
+
+  const handleChange = (field: keyof FormValues) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
+    setValues((prev) => ({ ...prev, [field]: e.target.value }));
+    setSuccess(null);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    const parsed = adminUserSchema.safeParse(values);
+    if (!parsed.success) {
+      const errs: FieldErrors = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as keyof FieldErrors;
+        if (!errs[key]) errs[key] = issue.message;
+      }
+      setFieldErrors(errs);
+      return;
+    }
+    setFieldErrors({});
+    updateMutation.mutate(parsed.data);
+  };
+
+  const handleResetPassword = () => {
+    setPasswordError(null);
+    setSuccess(null);
+    const parsed = resetPasswordSchema.safeParse({ password: newPassword });
+    if (!parsed.success) {
+      setPasswordError(parsed.error.issues[0]?.message ?? 'Contraseña inválida');
+      return;
+    }
+    passwordMutation.mutate(newPassword);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex animate-fade-in items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Editar usuario"
+      onClick={onClose}
+    >
+      <div
+        className="my-8 w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-elevated"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-slate-900">Usuario</h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Pestañas: cuenta / documentos / historial */}
+        <div className="mb-5 flex gap-1 border-b border-slate-200">
+          {([
+            ['cuenta', 'Cuenta'],
+            ['documentos', 'Documentos'],
+            ['historial', 'Historial'],
+          ] as [Tab, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTab(key)}
+              className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                tab === key
+                  ? 'border-brand-600 text-brand-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'documentos' && <UserDocumentsPanel userId={userId} />}
+        {tab === 'historial' && <UserHistoryPanel userId={userId} />}
+
+        {tab === 'cuenta' &&
+          (isLoading ? (
+            <p className="py-8 text-center text-sm text-slate-500">Cargando…</p>
+          ) : (
+            <div className="flex flex-col gap-6">
+            {error && <Alert>{error}</Alert>}
+            {success && <Alert variant="info">{success}</Alert>}
+
+            {/* Datos de cuenta + perfil */}
+            <form onSubmit={handleSave} className="flex flex-col gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label="Usuario"
+                  name="username"
+                  value={values.username}
+                  onChange={handleChange('username')}
+                  error={fieldErrors.username}
+                />
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="role" className="text-sm font-medium text-slate-700">
+                    Rol
+                  </label>
+                  <select
+                    id="role"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
+                    value={values.role}
+                    disabled={isSelf}
+                    onChange={handleChange('role')}
+                  >
+                    {ALL_ROLES.map((role) => (
+                      <option key={role} value={role}>
+                        {ROLE_LABELS[role]}
+                      </option>
+                    ))}
+                  </select>
+                  {isSelf && (
+                    <span className="text-xs text-slate-400">
+                      No puedes cambiar tu propio rol.
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={values.email}
+                onChange={handleChange('email')}
+                error={fieldErrors.email}
+              />
+              <TextField
+                label="Nombre completo"
+                name="fullName"
+                value={values.fullName}
+                onChange={handleChange('fullName')}
+                error={fieldErrors.fullName}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label="Teléfono"
+                  name="phone"
+                  value={values.phone}
+                  onChange={handleChange('phone')}
+                  error={fieldErrors.phone}
+                />
+                <TextField
+                  label="Fecha de nacimiento"
+                  name="birthDate"
+                  type="date"
+                  value={values.birthDate}
+                  onChange={handleChange('birthDate')}
+                  error={fieldErrors.birthDate}
+                />
+              </div>
+              <TextField
+                label="Dirección"
+                name="address"
+                value={values.address}
+                onChange={handleChange('address')}
+                error={fieldErrors.address}
+              />
+              <TextArea
+                label="Biografía (opcional)"
+                name="bio"
+                value={values.bio}
+                onChange={handleChange('bio')}
+                error={fieldErrors.bio}
+              />
+              <div className="flex justify-end">
+                <Button type="submit" isLoading={updateMutation.isPending}>
+                  Guardar cambios
+                </Button>
+              </div>
+            </form>
+
+            {/* Restablecer contraseña */}
+            <div className="border-t border-slate-200 pt-5">
+              <h3 className="mb-2 text-sm font-semibold text-slate-800">
+                Restablecer contraseña
+              </h3>
+              <div className="flex items-end gap-3">
+                <div className="flex-1">
+                  <TextField
+                    label="Nueva contraseña"
+                    name="newPassword"
+                    type="text"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    error={passwordError ?? undefined}
+                    placeholder="Mín. 8, con mayús., minús. y número"
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={handleResetPassword}
+                  isLoading={passwordMutation.isPending}
+                >
+                  Restablecer
+                </Button>
+              </div>
+            </div>
+
+            {/* Eliminar usuario */}
+            {!isSelf && (
+              <div className="border-t border-slate-200 pt-5">
+                <h3 className="mb-2 text-sm font-semibold text-red-700">Zona peligrosa</h3>
+                {confirmingDelete ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-600">
+                      ¿Eliminar definitivamente a este usuario y todos sus datos?
+                    </span>
+                    <Button
+                      variant="danger"
+                      onClick={() => deleteMutation.mutate()}
+                      isLoading={deleteMutation.isPending}
+                    >
+                      Sí, eliminar
+                    </Button>
+                    <Button variant="ghost" onClick={() => setConfirmingDelete(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                ) : (
+                  <Button variant="danger" onClick={() => setConfirmingDelete(true)}>
+                    Eliminar usuario
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+          ))}
+      </div>
+    </div>
+  );
+}
