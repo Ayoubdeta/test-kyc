@@ -13,7 +13,9 @@ export function useChatStream(onEvent: (event: ChatStreamEvent) => void, enabled
   handlerRef.current = onEvent;
 
   useEffect(() => {
-    if (!enabled) return;
+    // SSE deshabilitado por entorno (p. ej. en la demo serverless de Vercel):
+    // el chat refresca por polling. En local (variable sin definir) sigue activo.
+    if (!enabled || import.meta.env.VITE_ENABLE_SSE === 'false') return;
     const source = new EventSource(`${config.apiUrl}/chat/stream`, { withCredentials: true });
 
     source.onmessage = (ev) => {

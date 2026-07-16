@@ -1,9 +1,12 @@
-import path from 'node:path';
+import crypto from 'node:crypto';
 import type { Request, Response } from 'express';
 import { CHAT_SENDER, type ChatSender } from '../config/constants';
+import { env } from '../config/env';
+import { EXT_BY_MIME } from '../middlewares/chatUpload.middleware';
 import { chatService, type OutgoingAttachment } from '../services/chat.service';
 import { AppError } from '../utils/AppError';
 import { chatBus, type ChatEvent } from '../utils/chatBus';
+import { fileStorage } from '../utils/storage';
 
 // Rol de chat del usuario autenticado: el cliente escribe como 'cliente';
 // cualquier rol interno, como 'staff'.
@@ -11,13 +14,16 @@ function senderRoleOf(req: Request): ChatSender {
   return req.user?.role === 'cliente' ? CHAT_SENDER.CLIENT : CHAT_SENDER.STAFF;
 }
 
-// Construye el adjunto (si multer recibió un fichero) con su ruta relativa,
-// que es la que persistimos para poder reconstruir la absoluta al descargar.
-function attachmentFrom(req: Request, clientId: string): OutgoingAttachment | null {
+// Sube el adjunto (si multer recibió un fichero) a Supabase Storage con la
+// clave "<clientId>/chat/<random>.<ext>" y devuelve sus metadatos para persistir.
+async function attachmentFrom(req: Request, clientId: string): Promise<OutgoingAttachment | null> {
   if (!req.file) return null;
+  const ext = EXT_BY_MIME[req.file.mimetype] ?? 'bin';
+  const stored = `${clientId}/chat/${crypto.randomBytes(16).toString('hex')}.${ext}`;
+  await fileStorage.uploadBuffer(stored, req.file.buffer, req.file.mimetype);
   return {
     name: req.file.originalname,
-    stored: path.posix.join(clientId, 'chat', req.file.filename),
+    stored,
     mime: req.file.mimetype,
     size: req.file.size,
   };
@@ -32,6 +38,13 @@ export const chatController = {
    */
   stream(req: Request, res: Response): void {
     if (!req.user) throw AppError.unauthorized('No autenticado');
+    // En serverless (Vercel) no hay procesos persistentes: el SSE se desactiva
+    // por entorno y el frontend usa polling. Cerramos de inmediato para no dejar
+    // la conexión colgada consumiendo invocaciones.
+    if (!env.ENABLE_SSE) {
+      res.status(204).end();
+      return;
+    }
     const { sub: userId, role } = req.user;
     const isClient = role === 'cliente';
     const myRole: ChatSender = isClient ? CHAT_SENDER.CLIENT : CHAT_SENDER.STAFF;
@@ -76,7 +89,7 @@ export const chatController = {
     const message = await chatService.sendAsClient(clientId, {
       body: typeof req.body?.body === 'string' ? req.body.body : '',
       replyToId: req.body?.replyToId || null,
-      attachment: attachmentFrom(req, clientId),
+      attachment: await attachmentFrom(req, clientId),
     });
     res.status(201).json({ message });
   },
@@ -116,7 +129,7 @@ export const chatController = {
     const message = await chatService.sendAsStaff(clientId, req.user.sub, {
       body: typeof req.body?.body === 'string' ? req.body.body : '',
       replyToId: req.body?.replyToId || null,
-      attachment: attachmentFrom(req, clientId),
+      attachment: await attachmentFrom(req, clientId),
     });
     res.status(201).json({ message });
   },
@@ -157,6 +170,7 @@ export const chatController = {
     if (!req.user) throw AppError.unauthorized('No autenticado');
     const target = await chatService.getAttachment(req.params.id, req.user.sub, senderRoleOf(req));
     res.type(target.mime);
-    res.download(target.absolutePath, target.name);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(target.name)}"`);
+    res.send(target.buffer);
   },
 };

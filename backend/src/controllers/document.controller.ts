@@ -89,7 +89,11 @@ export const documentController = {
     }
     const target = await documentService.getForDownload(req.params.id, req.user.sub);
     res.type(target.mimeType);
-    res.download(target.absolutePath, target.originalName);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(target.originalName)}"`,
+    );
+    res.send(target.buffer);
   },
 
   /** Compliance/Admin abren un documento para revisarlo (pendiente → en revisión). */

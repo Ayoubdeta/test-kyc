@@ -1,14 +1,12 @@
 import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 import { ACTIVATION_TTL_DAYS, MS_PER_DAY } from '../config/constants';
 import { withTransaction } from '../database/pool';
-import { uploadDir } from '../middlewares/upload.middleware';
 import { documentRepository } from '../repositories/document.repository';
 import { refreshTokenRepository } from '../repositories/refreshToken.repository';
 import { userRepository } from '../repositories/user.repository';
 import type { MeResponse, PublicProfile, PublicUser } from '../types';
 import { AppError } from '../utils/AppError';
+import { fileStorage } from '../utils/storage';
 import { toPublicProfile, toPublicUser } from '../utils/mappers';
 import { hashPassword } from '../utils/password';
 import { generateActivationToken, hashActivationToken } from '../utils/tokens';
@@ -162,7 +160,7 @@ export const userService = {
     await refreshTokenRepository.revokeAllForUser(targetUserId);
   },
 
-  /** Elimina un usuario, sus ficheros en disco y (en cascada) sus datos. */
+  /** Elimina un usuario, sus ficheros en Storage y (en cascada) sus datos. */
   async deleteUser(actingUserId: string, targetUserId: string): Promise<void> {
     if (targetUserId === actingUserId) {
       throw AppError.badRequest('No puedes eliminar tu propia cuenta');
@@ -172,18 +170,11 @@ export const userService = {
       throw AppError.notFound('Usuario no encontrado');
     }
 
-    // Borramos primero los ficheros físicos de sus documentos (la BD los
-    // eliminará en cascada, pero los ficheros en disco no).
+    // Borramos primero los ficheros de sus documentos en Storage (la BD los
+    // eliminará en cascada, pero los objetos en Storage no). Best-effort.
     const documents = await documentRepository.findByUser(targetUserId);
     for (const doc of documents) {
-      const filePath = path.join(uploadDir, doc.stored_name);
-      try {
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      } catch (error) {
-        // No abortamos el borrado del usuario por un fichero que no se pudo
-        // eliminar; lo registramos.
-        console.error(`[delete] No se pudo borrar ${filePath}:`, error);
-      }
+      await fileStorage.remove(doc.stored_name);
     }
 
     await userRepository.deleteById(targetUserId);

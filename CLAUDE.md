@@ -35,6 +35,7 @@
 - Ver sección "Próximas tareas".
 
 ## Última tarea realizada
+- **Despliegue gratuito en Vercel + Supabase (2026-07-16):** adaptación del proyecto para una **demo pública gratuita**. Frontend (SPA) y backend (Express como función serverless) en **dos proyectos Vercel**; el frontend **proxya `/api/*`** al backend vía `rewrite` de `frontend/vercel.json` (mismo origen → cookies `SameSite=Lax` sin problemas). PostgreSQL en **Supabase** (Connection Pooler 6543; `pool.ts` usa `DATABASE_URL`+SSL con `max:1` si está presente). Ficheros (PDFs + adjuntos de chat) migrados de disco a **Supabase Storage** (`backend/src/utils/storage.ts`; middlewares a `memoryStorage`; subida/descarga por buffer; descargas con `res.send(buffer)`). SSE **desactivado por entorno** (`ENABLE_SSE`/`VITE_ENABLE_SSE`) → chat por polling. `MAX_UPLOAD_MB=4` por el límite de payload de Vercel Hobby (~4,5 MB). Nuevos ficheros: `backend/api/index.ts`, `backend/vercel.json`, `frontend/vercel.json`, `db/init/_all_supabase.sql` (migraciones concatenadas) y **`DEPLOY.md`** (guía paso a paso). Verificado: typecheck backend, entrypoint Vercel y build frontend OK. **El flujo local con Docker sigue intacto.**
 - **Chat avanzado (2026-07-16):** tiempo real por **SSE** (`GET /chat/stream` + `chatBus` en memoria; las señales disparan recarga en el cliente), adjuntos PDF/imagen (`chatUpload` a `<clientId>/chat/`, descarga con auth), responder/citar (`reply_to_id`), editar y borrar (soft delete), reacciones emoji (JSONB toggle), "escribiendo…" (evento efímero), ticks de lectura por mensaje, identidad del agente, buscador en la conversación y separadores por día. Migración `10_chat_advanced.sql`. Verificado (typecheck, build y e2e, incl. entrega SSE en vivo).
 - **Informes + Logs (2026-07-16):** apartado de **Informes** para el personal interno (detalle filtrable de documentos + resumen + exportación CSV en cliente) y **Registro de actividad/logs** solo para admin (auditoría transversal con filtros y paginación). Nueva tabla `activity_logs`, `logService.record` tolerante a fallos enganchado en los controladores (auth/user/document). Migración `09_activity_logs.sql`. Verificado con typecheck, build y e2e.
 - **Fase 1 del rediseño de alta de cliente (2026-07-16):** eliminado el auto-registro (`/auth/register` → 404); el admin crea el cliente (razón social, CIF, tipo, comercial, email) generando su expediente en estado "Pendiente de completar" + token de activación (enlace mostrado en la app). El cliente activa su cuenta en `/activate?token=...` (contraseña + aceptación de privacidad/términos, auto-login). Nueva tabla `client_profiles` con todos los campos del expediente (Fase 2 nullable). Migración `08_client_onboarding.sql`. Verificado con typecheck, build y e2e (8/8).
@@ -92,6 +93,12 @@
 - **Exportación CSV en el cliente** (sin dependencias): separador `;` y BOM UTF-8 para compatibilidad con Excel en configuración ES.
 - **Acceso por rol**: Informes = `STAFF_ROLES` (admin/compliance/dirección); Logs = solo `admin`.
 - El log de auditoría (`activity_logs`) es **transversal y técnico** (quién hizo qué, cuándo, desde qué IP) y se diferencia de `document_events` (historial funcional de un documento, visible por el cliente).
+- **Despliegue serverless (Vercel + Supabase, 2026-07-16):**
+  - **Mismo origen vía proxy**: en vez de exponer el backend en otro dominio (que obligaría a `SameSite=None`+cookies de terceros, bloqueables por el navegador), el proyecto frontend de Vercel **reescribe `/api/*`** al proyecto backend. El navegador ve un único dominio → cookies `SameSite=Lax` intactas y sin CORS real. `frontend/src/lib/config.ts` usa `'/api'` por defecto (relativo).
+  - **Backend como función**: `backend/api/index.ts` exporta la app de Express (`createApp()`); `src/index.ts` (con `listen`) solo se usa en local/Docker. `backend/vercel.json` reescribe todo a la función conservando la ruta.
+  - **BD con pooler**: en serverless cada invocación es efímera; se usa el Connection Pooler de Supabase (Supavisor, puerto 6543, modo transaction) con `max:1` y `ssl`. `DATABASE_URL` tiene prioridad sobre `PG*` en `pool.ts`.
+  - **Ficheros en Supabase Storage** (no en disco): el disco serverless es efímero/solo lectura. `multer` pasa a `memoryStorage` y `backend/src/utils/storage.ts` (cliente `service_role`) sube/descarga/borra sobre un bucket privado. La columna `stored_name`/`attachment_stored` guarda ahora la **clave del objeto** en el bucket (misma semántica que antes con la ruta relativa). Descargas por buffer (`res.send`) — válido porque `MAX_UPLOAD_MB=4` cabe en el límite ~4,5 MB de Vercel Hobby. Mejora futura: subida directa navegador→Storage con signed URL para superar ese límite.
+  - **SSE desactivable por entorno**: `ENABLE_SSE` (backend, def. `true`) y `VITE_ENABLE_SSE` (frontend). En Vercel se ponen a `false` → el chat cae a polling (30 s); en local siguen activos. El endpoint `/chat/stream` responde `204` si `ENABLE_SSE` es falso.
 
 # Funcionalidades implementadas
 
@@ -175,8 +182,8 @@ Base: `http://localhost:4000/api`
 
 # Configuración
 
-- **Variables de entorno (backend):** `PORT`, `DATABASE_URL` (o `PGHOST`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`), `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `UPLOAD_DIR`, `CORS_ORIGIN`. (No incluir valores reales aquí.)
-- **Frontend:** `VITE_API_URL` (base de la API).
+- **Variables de entorno (backend):** `PORT`, `DATABASE_URL` (o `PGHOST`/`PGUSER`/`PGPASSWORD`/`PGDATABASE`), `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `UPLOAD_DIR`, `CORS_ORIGIN`, `COOKIE_SECURE`, `MAX_UPLOAD_MB` (def. 4). **Despliegue:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_BUCKET` (def. `kyc-files`), `ENABLE_SSE` (def. `true`; `false` en Vercel). (No incluir valores reales aquí.)
+- **Frontend:** `VITE_API_URL` (base de la API; def. `/api` si no se define), `VITE_ENABLE_SSE` (`false` en la demo Vercel).
 - **Configuraciones importantes:** cookies httpOnly para tokens; multer diskStorage a carpetas por usuario; Vite dev server en `5173`; API en `4000`.
 - **Constantes clave (`backend/src/config/constants.ts`):** ROLES, STAFF_ROLES, REVIEW_ROLES, APPROVAL_ROLES, DOCUMENT_STATUS (incluye `PENDING_APPROVAL`), NOTIFICATION_TYPE, DOCUMENT_EVENT, CHAT_SENDER, EXPIRY_WARNING_DAYS=15, MIN/MAX_VALIDITY_MONTHS, CLIENT_TYPE, EXPEDIENTE_STATUS, ACTIVATION_TTL_DAYS=7, LOG_ACTION, LOG_ENTITY.
 
@@ -220,6 +227,7 @@ Base: `http://localhost:4000/api`
 - **Registro de actividad / logs** (solo admin): tabla `activity_logs`, `logService.record` tolerante a fallos enganchado en controladores; endpoint `/logs` filtrable y paginado. Migración `09_activity_logs.sql`. Verificado con e2e (registro, filtros, permisos 403).
 - **Chat avanzado:** tiempo real por SSE (`chatBus` + `/chat/stream`), adjuntos PDF/imagen, responder/citar, editar/borrar (soft delete), reacciones, "escribiendo…", ticks de lectura, identidad del agente, buscador y separadores por día. Migración `10_chat_advanced.sql`. Verificado con e2e (incl. entrega SSE en vivo y permisos 403).
 - `CLAUDE.md` actualizado con todos estos cambios.
+- **Despliegue gratuito Vercel + Supabase:** backend Express como función serverless (`backend/api/index.ts` + `backend/vercel.json`), frontend con proxy `/api/*` (`frontend/vercel.json`), BD en Supabase (pooler, `DATABASE_URL` en `pool.ts`), ficheros en Supabase Storage (`utils/storage.ts`, middlewares a `memoryStorage`, descargas por buffer), SSE desactivable (`ENABLE_SSE`/`VITE_ENABLE_SSE`), `MAX_UPLOAD_MB=4`. Añadidos `db/init/_all_supabase.sql` y `DEPLOY.md`. Docker local sin cambios de comportamiento.
 
 # Notas para futuras sesiones
 

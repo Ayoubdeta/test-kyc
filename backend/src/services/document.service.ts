@@ -1,5 +1,4 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import crypto from 'node:crypto';
 import {
   DOCUMENT_EVENT,
   DOCUMENT_STATUS,
@@ -10,33 +9,24 @@ import {
   STAFF_ROLES,
   type DocumentTypeKey,
 } from '../config/constants';
-import { uploadDir } from '../middlewares/upload.middleware';
 import { documentRepository } from '../repositories/document.repository';
 import { documentEventRepository } from '../repositories/documentEvent.repository';
 import { userRepository } from '../repositories/user.repository';
 import type { PublicDocument, PublicDocumentEvent } from '../types';
 import { AppError } from '../utils/AppError';
+import { fileStorage } from '../utils/storage';
 import { toPublicDocument, toPublicDocumentEvent } from '../utils/mappers';
 import type { DecisionInput, ReviewInput } from '../validators/document.validators';
 import { notificationService } from './notification.service';
 
 export interface DownloadTarget {
-  absolutePath: string;
+  buffer: Buffer;
   originalName: string;
   mimeType: string;
 }
 
 function typeLabel(docType: DocumentTypeKey | null): string {
   return DOCUMENT_TYPES.find((t) => t.key === docType)?.label ?? 'Documento';
-}
-
-function removeFile(storedName: string): void {
-  const filePath = path.join(uploadDir, storedName);
-  try {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch (error) {
-    console.error(`[documents] No se pudo borrar el fichero ${filePath}:`, error);
-  }
 }
 
 export const documentService = {
@@ -52,13 +42,15 @@ export const documentService = {
   ): Promise<PublicDocument> {
     const existing = await documentRepository.findByUserAndType(userId, docType);
     if (existing) {
-      removeFile(existing.stored_name);
+      await fileStorage.remove(existing.stored_name);
       await documentRepository.deleteById(existing.id);
     }
 
-    // Guardamos la ruta RELATIVA (carpeta del usuario + fichero) para poder
-    // reconstruir la ruta absoluta al descargar/borrar, sea cual sea el volumen.
-    const storedName = path.posix.join(userId, file.filename);
+    // Clave del objeto en Supabase Storage: "<userId>/<random>.pdf". La guardamos
+    // en `stored_name` para poder descargarla/borrarla después.
+    const storedName = `${userId}/${crypto.randomBytes(16).toString('hex')}.pdf`;
+    await fileStorage.uploadBuffer(storedName, file.buffer, file.mimetype);
+
     const row = await documentRepository.create({
       userId,
       docType,
@@ -133,13 +125,13 @@ export const documentService = {
       }
     }
 
-    const absolutePath = path.join(uploadDir, doc.stored_name);
-    if (!fs.existsSync(absolutePath)) {
+    const buffer = await fileStorage.downloadBuffer(doc.stored_name);
+    if (!buffer) {
       throw AppError.notFound('El archivo ya no está disponible');
     }
 
     return {
-      absolutePath,
+      buffer,
       originalName: doc.original_name,
       mimeType: doc.mime_type,
     };

@@ -1,12 +1,10 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { CHAT_SENDER, type ChatSender } from '../config/constants';
 import { chatRepository } from '../repositories/chat.repository';
 import { userRepository } from '../repositories/user.repository';
 import type { ChatMessageWithMetaRow, PublicChatConversation, PublicChatMessage } from '../types';
 import { AppError } from '../utils/AppError';
 import { chatBus } from '../utils/chatBus';
-import { uploadDir } from '../middlewares/upload.middleware';
+import { fileStorage } from '../utils/storage';
 import { toPublicChatConversation, toPublicChatMessage } from '../utils/mappers';
 
 export interface OutgoingAttachment {
@@ -20,17 +18,6 @@ export interface SendInput {
   body: string;
   replyToId?: string | null;
   attachment?: OutgoingAttachment | null;
-}
-
-// Elimina el fichero de un adjunto del disco (best-effort, no rompe el flujo).
-function removeAttachment(stored: string | null): void {
-  if (!stored) return;
-  const filePath = path.join(uploadDir, stored);
-  try {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch (error) {
-    console.error(`[chat] No se pudo borrar el adjunto ${filePath}:`, error);
-  }
 }
 
 // Un mensaje debe llevar texto o adjunto (o ambos): no permitimos vacíos.
@@ -153,7 +140,8 @@ export const chatService = {
   ): Promise<PublicChatMessage> {
     const msg = await this.requireParticipant(messageId, userId, role);
     if (msg.sender_id !== userId) throw AppError.forbidden('Solo puedes borrar tus mensajes');
-    if (msg.attachment_stored) removeAttachment(msg.attachment_stored);
+    // Borrado del adjunto en Storage (best-effort, no rompe el soft delete).
+    if (msg.attachment_stored) await fileStorage.remove(msg.attachment_stored);
     const updated = await chatRepository.softDelete(messageId);
     chatBus.emit({ type: 'updated', clientId: msg.client_id });
     return toPublicChatMessage(updated!, role, userId);
@@ -191,15 +179,15 @@ export const chatService = {
     messageId: string,
     userId: string,
     role: ChatSender,
-  ): Promise<{ absolutePath: string; name: string; mime: string }> {
+  ): Promise<{ buffer: Buffer; name: string; mime: string }> {
     const msg = await this.requireParticipant(messageId, userId, role);
     if (!msg.attachment_stored || !msg.attachment_name || !msg.attachment_mime) {
       throw AppError.notFound('Este mensaje no tiene adjunto');
     }
-    const absolutePath = path.join(uploadDir, msg.attachment_stored);
-    if (!fs.existsSync(absolutePath)) {
+    const buffer = await fileStorage.downloadBuffer(msg.attachment_stored);
+    if (!buffer) {
       throw AppError.notFound('El adjunto ya no está disponible');
     }
-    return { absolutePath, name: msg.attachment_name, mime: msg.attachment_mime };
+    return { buffer, name: msg.attachment_name, mime: msg.attachment_mime };
   },
 };

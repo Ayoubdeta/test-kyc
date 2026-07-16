@@ -4,16 +4,30 @@ import { env } from '../config/env';
 // Pool de conexiones a PostgreSQL. Reutiliza conexiones en lugar de abrir
 // una nueva por petición: es la forma correcta y escalable de hablar con
 // la base de datos.
-export const pool = new Pool({
-  host: env.PGHOST,
-  port: env.PGPORT,
-  user: env.PGUSER,
-  password: env.PGPASSWORD,
-  database: env.PGDATABASE,
-  max: 10,
-  idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 5_000,
-});
+//
+// Dos modos:
+//  - DATABASE_URL (Supabase / serverless): usamos la cadena de conexión con
+//    SSL. En funciones serverless conviene un pool pequeño (max: 1) porque cada
+//    invocación es efímera y el pooler de Supabase (Supavisor) ya multiplexa.
+//  - PG* (Docker local): conexión directa con un pool mayor.
+export const pool = env.DATABASE_URL
+  ? new Pool({
+      connectionString: env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 1,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 10_000,
+    })
+  : new Pool({
+      host: env.PGHOST,
+      port: env.PGPORT,
+      user: env.PGUSER,
+      password: env.PGPASSWORD,
+      database: env.PGDATABASE,
+      max: 10,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 5_000,
+    });
 
 pool.on('error', (err) => {
   // Un cliente inactivo del pool falló; lo registramos para no perder la traza.
