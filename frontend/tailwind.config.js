@@ -63,6 +63,26 @@ export default {
           '0%': { transform: 'translateX(-140%) skewX(-12deg)' },
           '60%, 100%': { transform: 'translateX(240%) skewX(-12deg)' },
         },
+        // Buque que navega cruzando el fondo del login (temática puerto/terminal).
+        sail: {
+          '0%': { transform: 'translateX(-25vw)' },
+          '100%': { transform: 'translateX(125vw)' },
+        },
+        // Oleaje: vaivén horizontal muy suave del mar.
+        wave: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(-2.5%)' },
+        },
+        // Gotas/burbujas de producto que ascienden y se desvanecen.
+        rise: {
+          '0%': { transform: 'translateY(0) scale(1)', opacity: '0' },
+          '15%': { opacity: '0.55' },
+          '100%': { transform: 'translateY(-150px) scale(0.5)', opacity: '0' },
+        },
+        // Flujo de producto por las tuberías (dashes en movimiento).
+        'flow-dash': {
+          to: { 'stroke-dashoffset': '-240' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.4s ease-out both',
@@ -72,6 +92,10 @@ export default {
         'gradient-pan': 'gradient-pan 9s ease-in-out infinite',
         float: 'float 6s ease-in-out infinite',
         shine: 'shine 4s ease-in-out infinite',
+        sail: 'sail 48s linear infinite',
+        wave: 'wave 12s ease-in-out infinite',
+        rise: 'rise 7s ease-in infinite',
+        'flow-dash': 'flow-dash 3s linear infinite',
       },
     },
   },
