@@ -175,7 +175,7 @@ Base: `http://localhost:4000/api`
 
 # Componentes importantes
 
-- **Frontend — páginas:** `DashboardPage` (rama cliente → `ClientDashboard`), `ClientDocumentsPage`, `HistoryPage` (chips de filtro + `?estado=`), `ReviewDocumentsPage`, `PendingReviewDocumentsPage` (por revisar), `InReviewDocumentsPage` (en aprobación), `PendingApprovalPage` (Dirección), `KpisPage`, `ReportsPage` (informes, staff), `LogsPage` (auditoría, admin), `ChatPage`, `AdminUsersPage`, `NotificationsPage`, `SettingsPage`, `LoginPage`, `ActivatePage`. (`RegisterPage.tsx` sigue existiendo pero **sin ruta** — código muerto.)
+- **Frontend — páginas:** `DashboardPage` (rama cliente → `ClientDashboard`), `ClientDocumentsPage`, `HistoryPage` (chips de filtro + `?estado=`), `ReviewDocumentsPage`, `PendingReviewDocumentsPage` (por revisar), `InReviewDocumentsPage` (en aprobación), `PendingApprovalPage` (Dirección), `KpisPage`, `ReportsPage` (informes, staff), `LogsPage` (auditoría, admin), `ChatPage`, `AdminUsersPage`, `NotificationsPage`, `SettingsPage`, `LoginPage`, `ActivatePage`.
 - **Frontend — componentes:** `DocumentReviewList` (lista agrupada por usuario + auto-start en Ver + modales), `ClientDashboard` (hero animado, `ProgressRing`, `StatCard`, `ActionCard`), `DocumentTimeline` (stepper + botón "Reenviar"), `UserMenu` (menú de perfil en header, todos los roles), `CreateClientModal` (alta cliente + enlace de activación), `icons.tsx` (set SVG + `DocTypeIcon`/`EventIcon`/`NotificationIcon`), `StaffKpiOverview`, `charts/Charts` (KpiCard/DonutChart/BarChart/TrendBars), `NotificationBell`, `ChatWidget`, `ChatThread`, `UserDocumentsPanel`, `UserHistoryPanel`, `AdminUserEditModal`, `ClientDocumentsSummary`, `Badge`, `ui/*`.
 - **Frontend — componentes (chat):** `ChatThread` (hilo avanzado: responder, editar/borrar, reacciones, emojis, adjuntos, ticks, identidad del agente, buscar, separadores por día, "escribiendo…"), `ChatWidget` (cliente), `ChatAttachmentView` (previsualiza imagen / descarga adjunto vía blob).
 - **Frontend — hooks:** `useCountUp` (animación count-up con `requestAnimationFrame`, respeta `prefers-reduced-motion`), `useChatStream` (suscripción SSE con `EventSource` + credenciales).
@@ -196,16 +196,14 @@ Base: `http://localhost:4000/api`
 - Migraciones SQL se aplican **manualmente** (no hay runner automático).
 - Chat por polling (latencia de 10–20 s); sin websockets.
 - Entorno solo probado en local (Docker en Windows).
-- `RegisterPage.tsx` queda como **código muerto** (sin ruta tras eliminar el auto-registro); pendiente de borrar.
 - Activación **sin email real**: el enlace se muestra al admin en la app para compartirlo manualmente.
 
 # Próximas tareas
 
 1. **Fase 2 del alta de cliente:** asistente multipaso (pasos 2–8) para que el cliente complete el expediente (empresa, dirección fiscal, representante legal, persona de contacto, datos bancarios, KYC/declaraciones, documentación) → "Enviar para revisión" (`expediente_status = enviado`). La tabla `client_profiles` ya tiene todas las columnas (nullable). Tras activar, redirigir al asistente si el expediente está "pendiente de completar".
 2. **Fase 3 del alta de cliente:** revisión del expediente por Decal + nivel de riesgo + aprobar/rechazar + activar cliente (`expediente_status`: en_revision → aprobado/activo).
-3. Borrar `RegisterPage.tsx` (código muerto).
-4. Posible: asistente IA (análisis de documentos + resúmenes para staff) vía Claude API.
-5. Posible: runner automático de migraciones.
+3. Posible: asistente IA (análisis de documentos + resúmenes para staff) vía Claude API.
+4. Posible: runner automático de migraciones.
 6. Posible: conservar comentario de revisión al aprobar.
 7. Posible: envío real del enlace de activación por email.
 

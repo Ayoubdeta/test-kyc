@@ -5,19 +5,12 @@ import { logService } from '../services/activityLog.service';
 import { AppError } from '../utils/AppError';
 import { clearAuthCookies, setAuthCookies } from '../utils/cookies';
 import { getClientIp } from '../utils/requestContext';
-import type { ActivateInput, LoginInput, RegisterInput } from '../validators/auth.validators';
+import type { ActivateInput, LoginInput } from '../validators/auth.validators';
 
 // Los controladores solo traducen HTTP ↔ dominio: leen la petición, delegan
 // en el service y responden. La lógica vive en el service.
 
 export const authController = {
-  async register(req: Request, res: Response): Promise<void> {
-    const input = req.body as RegisterInput;
-    const { user, tokens } = await authService.register(input);
-    setAuthCookies(res, tokens);
-    res.status(201).json({ user });
-  },
-
   async login(req: Request, res: Response): Promise<void> {
     const input = req.body as LoginInput;
     const ip = getClientIp(req);

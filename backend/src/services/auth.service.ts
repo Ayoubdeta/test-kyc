@@ -13,7 +13,7 @@ import {
   hashRefreshToken,
   signAccessToken,
 } from '../utils/tokens';
-import type { ActivateInput, LoginInput, RegisterInput } from '../validators/auth.validators';
+import type { ActivateInput, LoginInput } from '../validators/auth.validators';
 
 // Hash ficticio para verificar contraseñas en ramas "usuario inválido" y no
 // filtrar por tiempos de respuesta si el usuario existe (mitiga enumeración).
@@ -55,35 +55,6 @@ async function issueTokens(user: UserRow): Promise<IssuedTokens> {
 }
 
 export const authService = {
-  /** Registra un usuario nuevo (con su perfil) y lo deja autenticado. */
-  async register(input: RegisterInput): Promise<AuthResult> {
-    const alreadyExists = await userRepository.existsByEmailOrUsername(
-      input.email,
-      input.username,
-    );
-    if (alreadyExists) {
-      // No revelamos cuál de los dos coincide, para no filtrar qué emails/usuarios existen.
-      throw AppError.conflict('El usuario o el email ya están registrados');
-    }
-
-    const passwordHash = await hashPassword(input.password);
-
-    const user = await withTransaction((client) =>
-      userRepository.createWithProfile(client, {
-        username: input.username,
-        email: input.email,
-        passwordHash,
-        fullName: input.fullName,
-        phone: input.phone,
-        address: input.address,
-        birthDate: input.birthDate,
-      }),
-    );
-
-    const tokens = await issueTokens(user);
-    return { user: toPublicUser(user), tokens };
-  },
-
   /**
    * Activa la cuenta de un cliente a partir del token del enlace de invitación:
    * fija la contraseña, acepta las políticas y lo deja autenticado.

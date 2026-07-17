@@ -45,6 +45,16 @@ export const STATUS_HEX: Record<DocumentStatus, string> = {
   caducado: '#f59e0b',
 };
 
+// Orden canónico de los estados (para selects, gráficas y tablas de KPIs/informes).
+export const STATUS_ORDER: DocumentStatus[] = [
+  'pendiente',
+  'en_revision',
+  'pendiente_aprobacion',
+  'aprobado',
+  'rechazado',
+  'caducado',
+];
+
 export const ALL_ROLES: Role[] = ['cliente', 'compliance', 'direccion', 'admin'];
 
 /** Personal interno: puede ver todos los documentos de clientes. */

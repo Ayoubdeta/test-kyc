@@ -34,38 +34,10 @@ export const birthDateField = z
     return date <= new Date() && date.getUTCFullYear() >= 1900;
   }, 'La fecha no es válida');
 
-// ─── Registro ─────────────────────────────────────────────────────
-export const registerSchema = z
-  .object({
-    username: z
-      .string()
-      .trim()
-      .min(3, 'Mínimo 3 caracteres')
-      .max(50, 'Máximo 50 caracteres')
-      .regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guion bajo'),
-    fullName: fullNameField,
-    email: z.string().trim().email('Email inválido'),
-    phone: phoneField,
-    address: addressField,
-    birthDate: birthDateField,
-    password: z
-      .string()
-      .min(8, 'Mínimo 8 caracteres')
-      .regex(/[a-z]/, 'Incluye una minúscula')
-      .regex(/[A-Z]/, 'Incluye una mayúscula')
-      .regex(/[0-9]/, 'Incluye un número'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Las contraseñas no coinciden',
-    path: ['confirmPassword'],
-  });
-
 // ─── Login ────────────────────────────────────────────────────────
 export const loginSchema = z.object({
   identifier: z.string().trim().min(1, 'Introduce tu usuario o email'),
   password: z.string().min(1, 'Introduce tu contraseña'),
 });
 
-export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
