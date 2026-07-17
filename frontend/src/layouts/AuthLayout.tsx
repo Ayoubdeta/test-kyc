@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AuthBackground } from '../components/AuthBackground';
 import { AuthCarousel } from '../components/AuthCarousel';
 import { AppLogo, PoweredByDecal } from '../components/Brand';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
@@ -18,9 +19,12 @@ export function AuthLayout({ title, subtitle, children, footer, size = 'md' }: A
   const maxWidth = size === 'lg' ? 'max-w-5xl' : 'max-w-4xl';
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 sm:p-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4 sm:p-6">
+      {/* Fondo dinámico animado (temática terminal Decal) */}
+      <AuthBackground />
+
       <div
-        className={`grid w-full ${maxWidth} animate-fade-in-up overflow-hidden rounded-3xl bg-white shadow-elevated md:grid-cols-2`}
+        className={`relative grid w-full ${maxWidth} animate-fade-in-up overflow-hidden rounded-3xl bg-white shadow-elevated md:grid-cols-2`}
       >
         {/* Panel de marca (oculto en móvil) */}
         <aside className="relative hidden flex-col justify-between bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800 p-10 text-white md:flex">
