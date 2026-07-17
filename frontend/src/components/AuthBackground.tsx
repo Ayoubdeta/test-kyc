@@ -5,6 +5,8 @@
 // en tonos de marca y con baja opacidad para que la tarjeta siga destacando.
 // Respeta `prefers-reduced-motion` (definido globalmente en index.css).
 
+import { DecalLogo } from './Brand';
+
 // Un clúster de "molécula": nodos unidos por enlaces (evoca metanol, MTBE/ETBE,
 // bioetanol, aditivos…).
 function Molecule({ className, delay = 0 }: { className?: string; delay?: number }) {
@@ -67,6 +69,19 @@ export function AuthBackground() {
         className="absolute -right-20 top-1/3 h-72 w-72 animate-float rounded-full bg-sky-200/30 blur-3xl"
         style={{ animationDelay: '2.5s' }}
       />
+
+      {/* Logo Decal fundido en la parte superior del fondo (marca de agua):
+          baja opacidad + mezcla con el fondo + máscara que lo desvanece hacia
+          abajo + leve flotación, para que quede integrado con la escena. */}
+      <div
+        className="absolute inset-x-0 top-0 flex justify-center pt-8 sm:pt-12"
+        style={{
+          maskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+        }}
+      >
+        <DecalLogo className="h-16 w-auto animate-float opacity-[0.12] mix-blend-multiply sm:h-24 md:h-28" />
+      </div>
 
       {/* 2 · Moléculas (químicos / biocombustibles) */}
       <Molecule className="left-[6%] top-[14%]" delay={0} />
