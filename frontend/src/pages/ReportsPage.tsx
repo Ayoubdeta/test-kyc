@@ -9,17 +9,8 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 import { exportCsv, type CsvColumn } from '../lib/csv';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import { formatDate } from '../lib/format';
-import { STATUS_BADGE_CLASSES } from '../lib/roles';
+import { STATUS_BADGE_CLASSES, STATUS_ORDER } from '../lib/roles';
 import type { DocumentStatus, DocumentTypeKey, ReportFilters, ReportRow } from '../types';
-
-const STATUS_ORDER: DocumentStatus[] = [
-  'pendiente',
-  'en_revision',
-  'pendiente_aprobacion',
-  'aprobado',
-  'rechazado',
-  'caducado',
-];
 
 const EMPTY_FILTERS: ReportFilters = {};
 

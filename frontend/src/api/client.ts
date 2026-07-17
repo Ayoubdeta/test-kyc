@@ -14,7 +14,7 @@ export const api = axios.create({
 });
 
 // Endpoints que NO deben disparar el auto-refresh (evita bucles infinitos).
-const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'];
+const AUTH_PATHS = ['/auth/login', '/auth/refresh', '/auth/logout'];
 
 function isAuthPath(url: string | undefined): boolean {
   if (!url) return false;

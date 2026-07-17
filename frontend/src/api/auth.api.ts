@@ -1,16 +1,6 @@
 import type { AuthResponse } from '../types';
 import { api } from './client';
 
-export interface RegisterPayload {
-  username: string;
-  email: string;
-  password: string;
-  fullName: string;
-  phone: string;
-  address: string;
-  birthDate: string;
-}
-
 export interface LoginPayload {
   identifier: string;
   password: string;
@@ -29,11 +19,6 @@ export interface ActivationInfo {
 }
 
 export const authApi = {
-  async register(payload: RegisterPayload): Promise<AuthResponse> {
-    const { data } = await api.post<AuthResponse>('/auth/register', payload);
-    return data;
-  },
-
   async login(payload: LoginPayload): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/login', payload);
     return data;

@@ -1,12 +1,6 @@
 import { z } from 'zod';
-import {
-  addressField,
-  birthDateField,
-  fullNameField,
-  phoneField,
-} from './profile.validators';
 
-// Piezas reutilizables de credenciales (registro, edición admin, etc.).
+// Piezas reutilizables de credenciales (edición admin, activación, etc.).
 export const usernameField = z
   .string()
   .trim()
@@ -27,18 +21,6 @@ export const passwordField = z
 // Esquemas de validación de entrada. La validación en servidor es la única
 // en la que se puede confiar (el cliente valida también, pero por UX).
 
-export const registerSchema = z.object({
-  username: usernameField,
-  email: emailField,
-  password: passwordField,
-  // Datos de perfil obligatorios al crear la cuenta (reutilizan las mismas
-  // reglas que la edición de perfil).
-  fullName: fullNameField,
-  phone: phoneField,
-  address: addressField,
-  birthDate: birthDateField,
-});
-
 export const loginSchema = z.object({
   // Se acepta iniciar sesión con email o con username, en un único campo.
   identifier: z.string().trim().min(1, 'Introduce tu usuario o email'),
@@ -57,6 +39,5 @@ export const activateSchema = z.object({
   }),
 });
 
-export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ActivateInput = z.infer<typeof activateSchema>;

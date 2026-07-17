@@ -1,12 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { createContext, useCallback, useMemo, type ReactNode } from 'react';
-import {
-  authApi,
-  type ActivatePayload,
-  type LoginPayload,
-  type RegisterPayload,
-} from '../api/auth.api';
+import { authApi, type ActivatePayload, type LoginPayload } from '../api/auth.api';
 import { userApi } from '../api/user.api';
 import type { MeResponse } from '../types';
 
@@ -20,7 +15,6 @@ export interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (payload: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
   activate: (payload: ActivatePayload) => Promise<void>;
   logout: () => Promise<void>;
   refetchMe: () => Promise<unknown>;
@@ -58,14 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [queryClient],
   );
 
-  const register = useCallback(
-    async (payload: RegisterPayload) => {
-      await authApi.register(payload);
-      await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
-    },
-    [queryClient],
-  );
-
   const activate = useCallback(
     async (payload: ActivatePayload) => {
       await authApi.activate(payload);
@@ -87,12 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: meQuery.isLoading,
       isAuthenticated: Boolean(meQuery.data),
       login,
-      register,
       activate,
       logout,
       refetchMe: () => queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY }),
     }),
-    [meQuery.data, meQuery.isLoading, login, register, activate, logout, queryClient],
+    [meQuery.data, meQuery.isLoading, login, activate, logout, queryClient],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,10 +1,8 @@
 import {
   DOCUMENT_EVENT,
-  DOCUMENT_TYPES,
   EXPIRY_WARNING_DAYS,
   MS_PER_DAY,
   NOTIFICATION_TYPE,
-  type DocumentTypeKey,
   type NotificationType,
 } from '../config/constants';
 import { documentRepository } from '../repositories/document.repository';
@@ -12,11 +10,7 @@ import { documentEventRepository } from '../repositories/documentEvent.repositor
 import { notificationRepository } from '../repositories/notification.repository';
 import type { PublicNotification } from '../types';
 import { AppError } from '../utils/AppError';
-import { toPublicNotification } from '../utils/mappers';
-
-function typeLabel(docType: DocumentTypeKey | null): string {
-  return DOCUMENT_TYPES.find((t) => t.key === docType)?.label ?? 'Documento';
-}
+import { docTypeLabel, toPublicNotification } from '../utils/mappers';
 
 /** Días (redondeados hacia arriba) que faltan hasta una fecha futura. */
 function daysUntil(date: Date): number {
@@ -53,7 +47,7 @@ export const notificationService = {
         userId,
         type: NOTIFICATION_TYPE.DOC_EXPIRED,
         title: 'Documento caducado',
-        message: `Tu documento "${typeLabel(doc.doc_type)}" ha caducado. Vuelve a subirlo para renovarlo.`,
+        message: `Tu documento "${docTypeLabel(doc.doc_type)}" ha caducado. Vuelve a subirlo para renovarlo.`,
         documentId: doc.id,
       });
       // Historial de auditoría (independiente de la notificación).
@@ -83,7 +77,7 @@ export const notificationService = {
         userId,
         type: NOTIFICATION_TYPE.DOC_EXPIRING,
         title: 'Documento próximo a caducar',
-        message: `Tu documento "${typeLabel(doc.doc_type)}" caduca en ${days} día${
+        message: `Tu documento "${docTypeLabel(doc.doc_type)}" caduca en ${days} día${
           days === 1 ? '' : 's'
         }. Renuévalo antes de que caduque.`,
         documentId: doc.id,

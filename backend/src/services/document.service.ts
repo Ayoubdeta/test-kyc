@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import {
   DOCUMENT_EVENT,
   DOCUMENT_STATUS,
-  DOCUMENT_TYPES,
   NOTIFICATION_TYPE,
   REVIEW_ROLES,
   ROLES,
@@ -15,7 +14,7 @@ import { userRepository } from '../repositories/user.repository';
 import type { PublicDocument, PublicDocumentEvent } from '../types';
 import { AppError } from '../utils/AppError';
 import { fileStorage } from '../utils/storage';
-import { toPublicDocument, toPublicDocumentEvent } from '../utils/mappers';
+import { docTypeLabel, toPublicDocument, toPublicDocumentEvent } from '../utils/mappers';
 import type { DecisionInput, ReviewInput } from '../validators/document.validators';
 import { notificationService } from './notification.service';
 
@@ -23,10 +22,6 @@ export interface DownloadTarget {
   buffer: Buffer;
   originalName: string;
   mimeType: string;
-}
-
-function typeLabel(docType: DocumentTypeKey | null): string {
-  return DOCUMENT_TYPES.find((t) => t.key === docType)?.label ?? 'Documento';
 }
 
 export const documentService = {
@@ -77,7 +72,7 @@ export const documentService = {
       userRepository.findIdsByRoles(REVIEW_ROLES),
     ]);
     const clientName = profile?.full_name || uploader?.username || 'Un cliente';
-    const label = typeLabel(row.doc_type);
+    const label = docTypeLabel(row.doc_type);
     for (const reviewerId of reviewerIds) {
       await notificationService.create({
         userId: reviewerId,
@@ -191,7 +186,7 @@ export const documentService = {
         throw AppError.notFound('Documento no encontrado');
       }
 
-      const label = typeLabel(updated.doc_type);
+      const label = docTypeLabel(updated.doc_type);
 
       // Historial de auditoría: cancelación en la fase de revisión (rechazado).
       await documentEventRepository.create({
@@ -225,7 +220,7 @@ export const documentService = {
       throw AppError.notFound('Documento no encontrado');
     }
 
-    const label = typeLabel(updated.doc_type);
+    const label = docTypeLabel(updated.doc_type);
 
     // Historial de auditoría: revisión previa de compliance/admin.
     await documentEventRepository.create({
@@ -307,7 +302,7 @@ export const documentService = {
     });
 
     // Notificación al cliente (propietario del documento).
-    const label = typeLabel(updated.doc_type);
+    const label = docTypeLabel(updated.doc_type);
     if (approving && expiresAt) {
       await notificationService.create({
         userId: updated.user_id,

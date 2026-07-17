@@ -7,17 +7,8 @@ import { useI18n } from '../i18n';
 import { docTypeLabel, statusLabel } from '../i18n/labels';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { DOCUMENT_TYPES } from '../lib/documents';
-import { STATUS_HEX } from '../lib/roles';
+import { STATUS_HEX, STATUS_ORDER } from '../lib/roles';
 import type { DocumentStatus, DocumentTypeKey, StatsFilters } from '../types';
-
-const STATUS_ORDER: DocumentStatus[] = [
-  'pendiente',
-  'en_revision',
-  'pendiente_aprobacion',
-  'aprobado',
-  'rechazado',
-  'caducado',
-];
 
 // 'YYYY-MM' → 'MM/AA'
 function shortMonth(m: string): string {
