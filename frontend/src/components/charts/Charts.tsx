@@ -7,25 +7,44 @@ interface KpiCardProps {
   value: number | string;
   icon?: ReactNode;
   hint?: string;
-  /** Clases de color del acento (borde/valor). */
+  /** Clases de color del acento (chip del icono + valor). */
   accent?: string;
+  /** Clase de fondo del chip del icono (p. ej. "bg-brand-50"). */
+  iconBg?: string;
   /** Si se indica, la tarjeta es un enlace a esa ruta. */
   to?: string;
 }
 
-export function KpiCard({ label, value, icon, hint, accent = 'text-brand-600', to }: KpiCardProps) {
-  const base = 'animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-4 shadow-card';
+export function KpiCard({
+  label,
+  value,
+  icon,
+  hint,
+  accent = 'text-brand-600',
+  iconBg = 'bg-brand-50',
+  to,
+}: KpiCardProps) {
+  const base =
+    'group relative animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-card';
   const content = (
     <>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</span>
-        {icon && <span aria-hidden="true">{icon}</span>}
+      <div className="flex items-center gap-3">
+        {icon && (
+          <span
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition duration-200 group-hover:scale-110 ${iconBg} ${accent}`}
+            aria-hidden="true"
+          >
+            {icon}
+          </span>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            {label}
+          </p>
+          <p className={`text-2xl font-bold leading-tight tabular-nums ${accent}`}>{value}</p>
+        </div>
       </div>
-      <p className={`mt-2 text-3xl font-bold ${accent}`}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
-      {to && (
-        <span className="mt-1 inline-block text-xs font-medium text-brand-600">Ver →</span>
-      )}
+      {hint && <p className="mt-2 text-xs text-slate-400">{hint}</p>}
     </>
   );
 
@@ -33,7 +52,7 @@ export function KpiCard({ label, value, icon, hint, accent = 'text-brand-600', t
     return (
       <Link
         to={to}
-        className={`${base} block transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-elevated`}
+        className={`${base} block transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-elevated`}
       >
         {content}
       </Link>

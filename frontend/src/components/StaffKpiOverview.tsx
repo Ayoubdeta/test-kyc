@@ -5,6 +5,16 @@ import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { canApprove, STATUS_HEX } from '../lib/roles';
 import { BarChart, DonutChart, KpiCard, TrendBars } from './charts/Charts';
+import {
+  AlertTriangleIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  InboxIcon,
+  SearchIcon,
+  SendIcon,
+} from './icons';
+
+const ICON_CLASS = 'h-5 w-5';
 
 export const OVERVIEW_KEY = ['stats', 'overview'] as const;
 
@@ -35,12 +45,12 @@ export function StaffKpiOverview() {
   const approvalTo = isDireccion ? '/approvals' : '/review';
 
   const kpis = [
-    { label: tr('kpi.sentIn', { year: data.year }), value: t.enviadosEsteAno, accent: 'text-brand-600', icon: '📤', to: '/kpis' },
-    { label: tr('kpi.toReview'), value: t.pendientes, accent: 'text-slate-600', icon: '🕒', to: porRevisarTo },
-    { label: tr('kpi.inReview'), value: t.enRevision, accent: 'text-blue-600', icon: '🔎', to: enRevisionTo },
-    { label: tr('kpi.pendingApproval'), value: t.pendienteAprobacion, accent: 'text-indigo-600', icon: '📥', to: approvalTo },
-    { label: tr('kpi.approved'), value: t.aprobados, accent: 'text-green-600', icon: '✅', to: '/kpis' },
-    { label: tr('kpi.expired'), value: t.caducados, accent: 'text-amber-600', icon: '⏰', to: '/kpis' },
+    { label: tr('kpi.sentIn', { year: data.year }), value: t.enviadosEsteAno, accent: 'text-brand-600', iconBg: 'bg-brand-50', icon: <SendIcon className={ICON_CLASS} />, to: '/kpis' },
+    { label: tr('kpi.toReview'), value: t.pendientes, accent: 'text-slate-600', iconBg: 'bg-slate-100', icon: <ClockIcon className={ICON_CLASS} />, to: porRevisarTo },
+    { label: tr('kpi.inReview'), value: t.enRevision, accent: 'text-blue-600', iconBg: 'bg-blue-50', icon: <SearchIcon className={ICON_CLASS} />, to: enRevisionTo },
+    { label: tr('kpi.pendingApproval'), value: t.pendienteAprobacion, accent: 'text-indigo-600', iconBg: 'bg-indigo-50', icon: <InboxIcon className={ICON_CLASS} />, to: approvalTo },
+    { label: tr('kpi.approved'), value: t.aprobados, accent: 'text-green-600', iconBg: 'bg-green-50', icon: <CheckCircleIcon className={ICON_CLASS} />, to: '/kpis' },
+    { label: tr('kpi.expired'), value: t.caducados, accent: 'text-amber-600', iconBg: 'bg-amber-50', icon: <AlertTriangleIcon className={ICON_CLASS} />, to: '/kpis' },
   ];
 
   const donut = [
@@ -68,6 +78,7 @@ export function StaffKpiOverview() {
             label={k.label}
             value={k.value}
             accent={k.accent}
+            iconBg={k.iconBg}
             icon={k.icon}
             to={k.to}
           />
