@@ -8,6 +8,7 @@ import {
   STAFF_ROLES,
   type DocumentTypeKey,
 } from '../config/constants';
+import { withTransaction } from '../database/pool';
 import { documentRepository } from '../repositories/document.repository';
 import { documentEventRepository } from '../repositories/documentEvent.repository';
 import { userRepository } from '../repositories/user.repository';
@@ -44,34 +45,56 @@ export const documentService = {
     }
 
     const existing = await documentRepository.findByUserAndType(userId, docType);
-    if (existing) {
-      await fileStorage.remove(existing.stored_name);
-      await documentRepository.deleteById(existing.id);
-    }
 
     // Clave del objeto en Supabase Storage: "<userId>/<random>.pdf". La guardamos
-    // en `stored_name` para poder descargarla/borrarla después.
+    // en `stored_name` para poder descargarla/borrarla después. Subimos el fichero
+    // ANTES de la transacción (Storage no participa en la tx de BD); si la tx
+    // falla, borramos el fichero recién subido para no dejar huérfanos.
     const storedName = `${userId}/${crypto.randomBytes(16).toString('hex')}.pdf`;
     await fileStorage.uploadBuffer(storedName, file.buffer, file.mimetype);
 
-    const row = await documentRepository.create({
-      userId,
-      docType,
-      originalName: file.originalname,
-      storedName,
-      mimeType: file.mimetype,
-      sizeBytes: file.size,
-    });
+    let row;
+    try {
+      // El borrado de la fila anterior + el alta + el evento de auditoría deben
+      // ser atómicos (un fallo no debe dejar un documento sin su evento).
+      row = await withTransaction(async (client) => {
+        if (existing) {
+          await documentRepository.deleteById(existing.id, client);
+        }
+        const created = await documentRepository.create(
+          {
+            userId,
+            docType,
+            originalName: file.originalname,
+            storedName,
+            mimeType: file.mimetype,
+            sizeBytes: file.size,
+          },
+          client,
+        );
+        await documentEventRepository.create(
+          {
+            userId,
+            documentId: created.id,
+            docType: created.doc_type,
+            originalName: created.original_name,
+            eventType: DOCUMENT_EVENT.UPLOADED,
+            actorId: userId,
+          },
+          client,
+        );
+        return created;
+      });
+    } catch (err) {
+      // La tx falló: el fichero nuevo ya está en Storage → lo eliminamos.
+      await fileStorage.remove(storedName).catch(() => undefined);
+      throw err;
+    }
 
-    // Historial de auditoría: el cliente sube (o sustituye) el documento.
-    await documentEventRepository.create({
-      userId,
-      documentId: row.id,
-      docType: row.doc_type,
-      originalName: row.original_name,
-      eventType: DOCUMENT_EVENT.UPLOADED,
-      actorId: userId,
-    });
+    // Ya con la BD consolidada, borramos el fichero antiguo (best-effort).
+    if (existing) {
+      await fileStorage.remove(existing.stored_name).catch(() => undefined);
+    }
 
     // Aviso a compliance/admin: este cliente ha subido documentación a revisar.
     const [uploader, profile, reviewerIds] = await Promise.all([
@@ -186,26 +209,32 @@ export const documentService = {
     const note = input.comment && input.comment.trim() !== '' ? input.comment.trim() : null;
 
     if (input.action === 'cancelar') {
-      const updated = await documentRepository.rejectByReviewer(documentId, {
-        reviewerId,
-        comment: note,
+      // El cambio de estado y su evento de auditoría, atómicos.
+      const updated = await withTransaction(async (client) => {
+        const u = await documentRepository.rejectByReviewer(
+          documentId,
+          { reviewerId, comment: note },
+          client,
+        );
+        if (!u) {
+          throw AppError.notFound('Documento no encontrado');
+        }
+        await documentEventRepository.create(
+          {
+            userId: u.user_id,
+            documentId: u.id,
+            docType: u.doc_type,
+            originalName: u.original_name,
+            eventType: DOCUMENT_EVENT.REJECTED,
+            comment: note,
+            actorId: reviewerId,
+          },
+          client,
+        );
+        return u;
       });
-      if (!updated) {
-        throw AppError.notFound('Documento no encontrado');
-      }
 
       const label = docTypeLabel(updated.doc_type);
-
-      // Historial de auditoría: cancelación en la fase de revisión (rechazado).
-      await documentEventRepository.create({
-        userId: updated.user_id,
-        documentId: updated.id,
-        docType: updated.doc_type,
-        originalName: updated.original_name,
-        eventType: DOCUMENT_EVENT.REJECTED,
-        comment: note,
-        actorId: reviewerId,
-      });
 
       // Notificación al cliente con el motivo para que reenvíe la documentación.
       await notificationService.create({
@@ -222,27 +251,32 @@ export const documentService = {
     // action === 'enviar_aprobacion'. El revisor propone la validez (meses); se
     // guarda en el documento para calcular la caducidad cuando Dirección apruebe.
     // El validador garantiza que viene informada; se usa 12 como red de seguridad.
-    const updated = await documentRepository.sendToApproval(documentId, {
-      reviewerId,
-      comment: note,
-      validityMonths: input.validityMonths ?? 12,
+    const updated = await withTransaction(async (client) => {
+      const u = await documentRepository.sendToApproval(
+        documentId,
+        { reviewerId, comment: note, validityMonths: input.validityMonths ?? 12 },
+        client,
+      );
+      if (!u) {
+        throw AppError.notFound('Documento no encontrado');
+      }
+      // Historial de auditoría: revisión previa de compliance/admin.
+      await documentEventRepository.create(
+        {
+          userId: u.user_id,
+          documentId: u.id,
+          docType: u.doc_type,
+          originalName: u.original_name,
+          eventType: DOCUMENT_EVENT.REVIEWED,
+          comment: note,
+          actorId: reviewerId,
+        },
+        client,
+      );
+      return u;
     });
-    if (!updated) {
-      throw AppError.notFound('Documento no encontrado');
-    }
 
     const label = docTypeLabel(updated.doc_type);
-
-    // Historial de auditoría: revisión previa de compliance/admin.
-    await documentEventRepository.create({
-      userId: updated.user_id,
-      documentId: updated.id,
-      docType: updated.doc_type,
-      originalName: updated.original_name,
-      eventType: DOCUMENT_EVENT.REVIEWED,
-      comment: note,
-      actorId: reviewerId,
-    });
 
     // Aviso a Dirección General: hay un documento esperando su decisión.
     const direccionIds = await userRepository.findIdsByRole(ROLES.DIRECCION);
@@ -294,27 +328,30 @@ export const documentService = {
 
     const comment = input.comment && input.comment.trim() !== '' ? input.comment.trim() : null;
 
-    const updated = await documentRepository.decide(documentId, {
-      status: input.status,
-      comment,
-      deciderId,
-      expiresAt,
-      validityMonths,
-    });
-    if (!updated) {
-      throw AppError.notFound('Documento no encontrado');
-    }
-
-    // Historial de auditoría: decisión final de Dirección.
-    await documentEventRepository.create({
-      userId: updated.user_id,
-      documentId: updated.id,
-      docType: updated.doc_type,
-      originalName: updated.original_name,
-      eventType: approving ? DOCUMENT_EVENT.APPROVED : DOCUMENT_EVENT.REJECTED,
-      comment,
-      expiresAt,
-      actorId: deciderId,
+    // La decisión (cambio de estado) y su evento de auditoría, atómicos.
+    const updated = await withTransaction(async (client) => {
+      const u = await documentRepository.decide(
+        documentId,
+        { status: input.status, comment, deciderId, expiresAt, validityMonths },
+        client,
+      );
+      if (!u) {
+        throw AppError.notFound('Documento no encontrado');
+      }
+      await documentEventRepository.create(
+        {
+          userId: u.user_id,
+          documentId: u.id,
+          docType: u.doc_type,
+          originalName: u.original_name,
+          eventType: approving ? DOCUMENT_EVENT.APPROVED : DOCUMENT_EVENT.REJECTED,
+          comment,
+          expiresAt,
+          actorId: deciderId,
+        },
+        client,
+      );
+      return u;
     });
 
     // Notificación al cliente (propietario del documento).

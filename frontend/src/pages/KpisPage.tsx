@@ -181,17 +181,17 @@ export function KpisPage() {
             {data.byUser.length === 0 ? (
               <p className="p-6 text-sm text-slate-500">{t('kpi.noDataForFilters')}</p>
             ) : (
-              <table className="w-full min-w-[720px] text-left text-sm">
+              <table className="w-full min-w-[720px] text-start text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-4 py-3">{t('kpi.thUser')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thTotal')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thPending')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thInReview')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thPendingApproval')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thApproved')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thRejected')}</th>
-                    <th className="px-4 py-3 text-right">{t('kpi.thExpired')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thTotal')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thPending')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thInReview')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thPendingApproval')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thApproved')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thRejected')}</th>
+                    <th className="px-4 py-3 text-end">{t('kpi.thExpired')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -201,13 +201,13 @@ export function KpisPage() {
                         <div className="font-medium text-slate-800">{u.name}</div>
                         <div className="text-xs text-slate-500">{u.email}</div>
                       </td>
-                      <td className="px-4 py-3 text-right font-semibold text-slate-800">{u.total}</td>
-                      <td className="px-4 py-3 text-right text-slate-600">{u.pendiente}</td>
-                      <td className="px-4 py-3 text-right text-blue-600">{u.en_revision}</td>
-                      <td className="px-4 py-3 text-right text-indigo-600">{u.pendiente_aprobacion}</td>
-                      <td className="px-4 py-3 text-right text-green-600">{u.aprobado}</td>
-                      <td className="px-4 py-3 text-right text-red-600">{u.rechazado}</td>
-                      <td className="px-4 py-3 text-right text-amber-600">{u.caducado}</td>
+                      <td className="px-4 py-3 text-end font-semibold text-slate-800">{u.total}</td>
+                      <td className="px-4 py-3 text-end text-slate-600">{u.pendiente}</td>
+                      <td className="px-4 py-3 text-end text-blue-600">{u.en_revision}</td>
+                      <td className="px-4 py-3 text-end text-indigo-600">{u.pendiente_aprobacion}</td>
+                      <td className="px-4 py-3 text-end text-green-600">{u.aprobado}</td>
+                      <td className="px-4 py-3 text-end text-red-600">{u.rechazado}</td>
+                      <td className="px-4 py-3 text-end text-amber-600">{u.caducado}</td>
                     </tr>
                   ))}
                 </tbody>

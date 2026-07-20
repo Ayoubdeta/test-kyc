@@ -1,7 +1,13 @@
+import type { PoolClient } from 'pg';
 import type { DocumentTypeKey, StoredDocumentStatus } from '../config/constants';
 import { NOTIFICATION_TYPE } from '../config/constants';
-import { query } from '../database/pool';
+import { pool, query } from '../database/pool';
 import type { DocumentRow, DocumentWithOwnerRow } from '../types';
+
+// Ejecutor de consultas: el pool (por defecto) o un cliente de transacción.
+// Permite que las escrituras se ejecuten dentro de un `withTransaction`.
+type Executor = Pick<PoolClient, 'query'>;
+const exec = (client?: Executor): Executor => client ?? pool;
 
 interface CreateDocumentParams {
   userId: string;
@@ -32,8 +38,8 @@ interface DecideParams {
 }
 
 export const documentRepository = {
-  async create(params: CreateDocumentParams): Promise<DocumentRow> {
-    const rows = await query<DocumentRow>(
+  async create(params: CreateDocumentParams, client?: Executor): Promise<DocumentRow> {
+    const result = await exec(client).query<DocumentRow>(
       `INSERT INTO documents (user_id, doc_type, original_name, stored_name, mime_type, size_bytes)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
@@ -46,7 +52,7 @@ export const documentRepository = {
         params.sizeBytes,
       ],
     );
-    return rows[0];
+    return result.rows[0];
   },
 
   async findByUser(userId: string): Promise<DocumentRow[]> {
@@ -85,8 +91,8 @@ export const documentRepository = {
     return rows[0] ?? null;
   },
 
-  async deleteById(id: string): Promise<void> {
-    await query(`DELETE FROM documents WHERE id = $1`, [id]);
+  async deleteById(id: string, client?: Executor): Promise<void> {
+    await exec(client).query(`DELETE FROM documents WHERE id = $1`, [id]);
   },
 
   /** Compliance/Admin abren el documento para revisarlo (pendiente → en_revision). */
@@ -107,8 +113,12 @@ export const documentRepository = {
    * Compliance/Admin envían el documento a Dirección tras revisarlo
    * (en_revision → pendiente_aprobacion).
    */
-  async sendToApproval(id: string, params: SendToApprovalParams): Promise<DocumentRow | null> {
-    const rows = await query<DocumentRow>(
+  async sendToApproval(
+    id: string,
+    params: SendToApprovalParams,
+    client?: Executor,
+  ): Promise<DocumentRow | null> {
+    const result = await exec(client).query<DocumentRow>(
       `UPDATE documents
           SET status = 'pendiente_aprobacion',
               reviewed_by = $2,
@@ -119,12 +129,16 @@ export const documentRepository = {
         RETURNING *`,
       [id, params.reviewerId, params.comment, params.validityMonths],
     );
-    return rows[0] ?? null;
+    return result.rows[0] ?? null;
   },
 
   /** Compliance/Admin rechazan en la fase de revisión (pendiente → rechazado). */
-  async rejectByReviewer(id: string, params: SendToReviewParams): Promise<DocumentRow | null> {
-    const rows = await query<DocumentRow>(
+  async rejectByReviewer(
+    id: string,
+    params: SendToReviewParams,
+    client?: Executor,
+  ): Promise<DocumentRow | null> {
+    const result = await exec(client).query<DocumentRow>(
       `UPDATE documents
           SET status = 'rechazado',
               reviewed_by = $2,
@@ -136,12 +150,12 @@ export const documentRepository = {
         RETURNING *`,
       [id, params.reviewerId, params.comment],
     );
-    return rows[0] ?? null;
+    return result.rows[0] ?? null;
   },
 
   /** Dirección decide (en_revision → aprobado/rechazado). */
-  async decide(id: string, params: DecideParams): Promise<DocumentRow | null> {
-    const rows = await query<DocumentRow>(
+  async decide(id: string, params: DecideParams, client?: Executor): Promise<DocumentRow | null> {
+    const result = await exec(client).query<DocumentRow>(
       `UPDATE documents
           SET status = $2,
               review_comment = $3,
@@ -153,7 +167,7 @@ export const documentRepository = {
         RETURNING *`,
       [id, params.status, params.comment, params.deciderId, params.expiresAt, params.validityMonths],
     );
-    return rows[0] ?? null;
+    return result.rows[0] ?? null;
   },
 
   /**

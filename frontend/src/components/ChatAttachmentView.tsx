@@ -79,7 +79,7 @@ export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
       type="button"
       onClick={download}
       disabled={downloading}
-      className={`mt-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
+      className={`mt-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-start text-xs transition ${
         mine
           ? 'border-white/30 bg-white/10 hover:bg-white/20'
           : 'border-slate-200 bg-white hover:bg-slate-50'

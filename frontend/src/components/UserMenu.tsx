@@ -61,7 +61,7 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-xl py-1 pl-1 pr-2 text-white/90 transition hover:bg-white/10"
+        className="flex items-center gap-2 rounded-xl py-1 ps-1 pe-2 text-white/90 transition hover:bg-white/10"
         aria-label={t('userMenu.openMenu')}
         aria-expanded={open}
       >
@@ -85,7 +85,7 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-72 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
+        <div className="absolute end-0 z-40 mt-2 w-72 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
           {/* Cabecera con la identidad del usuario */}
           <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-4">
             <Avatar src={profile.avatarUrl} name={displayName} size="sm" />

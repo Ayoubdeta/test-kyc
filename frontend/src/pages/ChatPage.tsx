@@ -113,7 +113,7 @@ export function ChatPage() {
                   <button
                     type="button"
                     onClick={() => openConversation(c.clientId)}
-                    className={`flex w-full items-start gap-2 px-4 py-3 text-left transition hover:bg-slate-50 ${
+                    className={`flex w-full items-start gap-2 px-4 py-3 text-start transition hover:bg-slate-50 ${
                       selected === c.clientId ? 'bg-brand-50' : ''
                     }`}
                   >

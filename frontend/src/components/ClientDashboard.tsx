@@ -133,7 +133,7 @@ function ActionCard({
         <p className="mt-0.5 text-sm text-slate-500">{description}</p>
       </div>
       <span
-        className="ml-auto text-brand-500 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+        className="ms-auto text-brand-500 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
         aria-hidden="true"
       >
         →
@@ -185,12 +185,12 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800 bg-[length:200%_200%] p-6 text-white shadow-elevated animate-gradient-pan sm:p-8">
         {/* Barrido de brillo */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -inset-y-10 left-0 w-1/3 bg-white/10 blur-xl animate-shine" />
+          <div className="absolute -inset-y-10 start-0 w-1/3 bg-white/10 blur-xl animate-shine" />
         </div>
         {/* Círculos decorativos flotantes */}
-        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 animate-float" />
+        <div className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-white/10 animate-float" />
         <div
-          className="pointer-events-none absolute -bottom-16 right-24 h-32 w-32 rounded-full bg-white/5 animate-float"
+          className="pointer-events-none absolute -bottom-16 end-24 h-32 w-32 rounded-full bg-white/5 animate-float"
           style={{ animationDelay: '1.5s' }}
         />
 

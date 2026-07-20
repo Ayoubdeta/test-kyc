@@ -138,14 +138,14 @@ export function ReportsPage() {
           <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium text-slate-700">{t('rep.client')}</span>
             <div className="relative">
-              <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder={t('rep.searchPlaceholder')}
                 value={draft.search ?? ''}
                 onChange={(e) => setDraft((d) => ({ ...d, search: e.target.value || undefined }))}
                 onKeyDown={(e) => e.key === 'Enter' && apply()}
-                className="w-full rounded-lg border border-slate-300 py-2 pl-8 pr-3 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-lg border border-slate-300 py-2 ps-8 pe-3 text-sm outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </label>
@@ -198,7 +198,7 @@ export function ReportsPage() {
                 <p className="text-sm text-slate-500">{t('rep.empty')}</p>
               </div>
             ) : (
-              <table className="w-full min-w-[900px] text-left text-sm">
+              <table className="w-full min-w-[900px] text-start text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-4 py-3">{t('rep.thClient')}</th>

@@ -35,6 +35,12 @@ funcionan sin problemas cross-site.
   que el chat refresca por **polling** (~30 s). Se controla con `ENABLE_SSE=false`
   (backend) y `VITE_ENABLE_SSE=false` (frontend).
 - **Cold start**: la primera petición tras un rato de inactividad tarda 1-2 s.
+- **Auto-pausa de Supabase**: el plan gratuito **pausa el proyecto tras ~7 días
+  sin actividad** (hay que reactivarlo a mano desde el panel). Para evitarlo, ver
+  el ping programado en "Operación y mantenimiento".
+- **Cupos del plan gratuito** (aprox.): ~500 MB de base de datos, ~1 GB de Storage
+  y backups limitados (sin point-in-time recovery). De sobra para una demo, pero
+  conviene vigilarlos y hacer copias (ver más abajo).
 
 ---
 
@@ -67,6 +73,13 @@ Cuentas gratuitas en: **GitHub**, **Vercel** y **Supabase**. Sube este repo a Gi
    y pégalo. Ejecuta (**Run**). Es idempotente y crea todas las tablas.
 3. Comprueba en **Table Editor** que aparecen `users`, `documents`, `client_profiles`,
    `chat_messages`, `activity_logs`, etc.
+
+> **Alternativa (runner de migraciones):** en vez de pegar el bundle, puedes aplicar
+> las migraciones numeradas con el runner, apuntando `DATABASE_URL` a Supabase:
+> `cd backend && npm run migrate`. Registra lo aplicado en la tabla `schema_migrations`
+> y solo ejecuta lo pendiente. Si la BD **ya** tenía tablas creadas a mano, marca el
+> estado inicial sin re-ejecutar con `npm run migrate -- --baseline`. A partir de ahí,
+> cada nueva migración `db/init/NN_*.sql` se aplica con `npm run migrate`.
 
 ## Paso 3 — Crear el bucket de Storage
 
@@ -170,6 +183,36 @@ Abre la URL del frontend y comprueba:
    como Dirección, aprobar/rechazar.
 5. **Chat**: envía un mensaje y un adjunto; refresca (polling) y descarga el adjunto.
    En la consola del navegador no debe haber reconexiones de `EventSource`.
+
+## Operación y mantenimiento
+
+- **Healthcheck**: `GET /api/health` responde `{ "status": "ok", "db": "up" }` y hace
+  un `SELECT 1` real; si la BD no responde devuelve **503**. Sirve para monitores
+  externos y como ping.
+- **Evitar la auto-pausa (~7 días)**: programa un ping periódico al healthcheck. Con
+  un cron gratuito de GitHub Actions (`.github/workflows`), por ejemplo cada 3 días:
+  ```yaml
+  on:
+    schedule:
+      - cron: '0 6 */3 * *'
+  jobs:
+    ping:
+      runs-on: ubuntu-latest
+      steps:
+        - run: curl -fsS https://<tu-frontend>.vercel.app/api/health
+  ```
+- **Backups de la base de datos**: el plan gratuito no tiene point-in-time recovery.
+  Haz una copia periódica con `pg_dump` usando la cadena del pooler:
+  ```bash
+  pg_dump "$DATABASE_URL" -Fc -f kyc_backup_$(date +%F).dump
+  ```
+  Restaurar: `pg_restore -d "$DATABASE_URL" kyc_backup_YYYY-MM-DD.dump`.
+- **Migraciones**: para aplicar nuevas migraciones (`db/init/NN_*.sql`) sin pegar SQL
+  a mano, apunta `DATABASE_URL` a Supabase y ejecuta `cd backend && npm run migrate`
+  (idempotente; registra lo aplicado en `schema_migrations`). Ver Paso 2.
+- **Vigilar cupos**: en el panel de Supabase revisa el uso de BD (~500 MB) y Storage
+  (~1 GB). `activity_logs` y los refresh tokens crecen con el tiempo; si hiciera
+  falta, purga los antiguos con un `DELETE ... WHERE created_at < now() - interval '90 days'`.
 
 ## Solución de problemas
 

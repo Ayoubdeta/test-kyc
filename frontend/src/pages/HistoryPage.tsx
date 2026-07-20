@@ -78,14 +78,14 @@ export function HistoryPage() {
           </p>
         </div>
       ) : (
-        <ol className="relative flex flex-col gap-4 border-l border-slate-200 pl-6">
+        <ol className="relative flex flex-col gap-4 border-s border-slate-200 ps-6">
           {filtered.map((ev) => {
             const meta = EVENT_META[ev.eventType];
             return (
               <li key={ev.id} className="relative animate-fade-in-up">
                 {/* Punto del timeline */}
                 <span
-                  className={`absolute -left-[1.9rem] top-1.5 h-3 w-3 rounded-full ring-4 ring-white ${meta.dot}`}
+                  className={`absolute -start-[1.9rem] top-1.5 h-3 w-3 rounded-full ring-4 ring-white ${meta.dot}`}
                   aria-hidden="true"
                 />
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">

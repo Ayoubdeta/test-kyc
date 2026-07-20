@@ -41,14 +41,14 @@ export function AdminUsersPage() {
         {isLoading ? (
           <p className="p-6 text-sm text-slate-500">{t('common.loading')}</p>
         ) : (
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[640px] text-start text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-4 py-3">{t('admin.thUser')}</th>
                 <th className="px-4 py-3">{t('admin.thEmail')}</th>
                 <th className="px-4 py-3">{t('admin.thCreated')}</th>
                 <th className="px-4 py-3">{t('admin.thRole')}</th>
-                <th className="px-4 py-3 text-right">{t('admin.thActions')}</th>
+                <th className="px-4 py-3 text-end">{t('admin.thActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -58,14 +58,14 @@ export function AdminUsersPage() {
                   <tr key={user.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">
                       {user.username}
-                      {isSelf && <span className="ml-2 text-xs text-slate-400">{t('admin.you')}</span>}
+                      {isSelf && <span className="ms-2 text-xs text-slate-400">{t('admin.you')}</span>}
                     </td>
                     <td className="px-4 py-3 text-slate-600">{user.email}</td>
                     <td className="px-4 py-3 text-slate-600">{formatDate(user.createdAt)}</td>
                     <td className="px-4 py-3">
                       <RoleBadge role={user.role} />
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <Button variant="ghost" onClick={() => setEditingId(user.id)}>
                         {t('admin.viewEdit')}
                       </Button>

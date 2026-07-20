@@ -64,9 +64,9 @@ export function AuthBackground() {
       />
 
       {/* Halos difusos que flotan */}
-      <div className="absolute -left-24 top-8 h-80 w-80 animate-float rounded-full bg-brand-200/30 blur-3xl" />
+      <div className="absolute -start-24 top-8 h-80 w-80 animate-float rounded-full bg-brand-200/30 blur-3xl" />
       <div
-        className="absolute -right-20 top-1/3 h-72 w-72 animate-float rounded-full bg-sky-200/30 blur-3xl"
+        className="absolute -end-20 top-1/3 h-72 w-72 animate-float rounded-full bg-sky-200/30 blur-3xl"
         style={{ animationDelay: '2.5s' }}
       />
 
@@ -84,9 +84,9 @@ export function AuthBackground() {
       </div>
 
       {/* 2 · Moléculas (químicos / biocombustibles) */}
-      <Molecule className="left-[6%] top-[14%]" delay={0} />
-      <Molecule className="right-[10%] top-[10%] h-16 w-16" delay={1.5} />
-      <Molecule className="left-[16%] bottom-[34%] h-20 w-20 text-slate-400/40" delay={3} />
+      <Molecule className="start-[6%] top-[14%]" delay={0} />
+      <Molecule className="end-[10%] top-[10%] h-16 w-16" delay={1.5} />
+      <Molecule className="start-[16%] bottom-[34%] h-20 w-20 text-slate-400/40" delay={3} />
 
       {/* 3 · Tuberías con flujo de producto (transferencias) */}
       <svg className="absolute inset-x-0 top-[30%] h-24 w-full" preserveAspectRatio="none" viewBox="0 0 1440 100">
@@ -121,7 +121,7 @@ export function AuthBackground() {
       {/* 4·5·6 · Escena de terminal portuaria anclada abajo */}
       <div className="absolute inset-x-0 bottom-0 h-[46%] min-h-[280px]">
         {/* Buque petrolero navegando */}
-        <div className="absolute bottom-[42%] left-0 animate-sail">
+        <div className="absolute bottom-[42%] start-0 animate-sail">
           <div className="animate-float">
             <svg viewBox="0 0 220 90" className="h-14 w-56 text-slate-500/45" fill="none">
               {/* casco */}

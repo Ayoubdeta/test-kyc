@@ -31,7 +31,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5 border-b border-slate-100 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between">
       <dt className="text-sm font-medium text-slate-500">{label}</dt>
-      <dd className="text-sm text-slate-900 sm:text-right">{value}</dd>
+      <dd className="text-sm text-slate-900 sm:text-end">{value}</dd>
     </div>
   );
 }

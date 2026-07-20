@@ -127,7 +127,7 @@ export function DonutChart({
           <li key={seg.label} className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-sm" style={{ backgroundColor: seg.color }} aria-hidden="true" />
             <span className="text-slate-600">{seg.label}</span>
-            <span className="ml-auto font-semibold text-slate-800">{seg.value}</span>
+            <span className="ms-auto font-semibold text-slate-800">{seg.value}</span>
           </li>
         ))}
       </ul>
@@ -160,7 +160,7 @@ export function BarChart({ items, emptyText = 'Sin datos' }: { items: BarItem[];
               style={{ width: `${(it.value / max) * 100}%`, backgroundColor: it.color ?? '#d7001b' }}
             />
           </span>
-          <span className="text-right font-semibold text-slate-800">{it.value}</span>
+          <span className="text-end font-semibold text-slate-800">{it.value}</span>
         </li>
       ))}
     </ul>

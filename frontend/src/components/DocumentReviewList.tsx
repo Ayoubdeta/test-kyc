@@ -239,7 +239,7 @@ export function DocumentReviewList({
               <button
                 type="button"
                 onClick={() => toggle(g.ownerId)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-slate-50"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start transition hover:bg-slate-50"
                 aria-expanded={isOpen}
               >
                 <div className="min-w-0">

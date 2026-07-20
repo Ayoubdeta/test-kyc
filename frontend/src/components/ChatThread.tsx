@@ -197,7 +197,7 @@ export function ChatThread({
                       {/* Vista del mensaje citado */}
                       {m.replyTo && (
                         <div
-                          className={`mb-1 rounded-md border-l-2 px-2 py-1 text-[11px] ${
+                          className={`mb-1 rounded-md border-s-2 px-2 py-1 text-[11px] ${
                             m.mine
                               ? 'border-white/50 bg-white/10 text-white/80'
                               : 'border-brand-400 bg-white/60 text-slate-500'
@@ -341,7 +341,7 @@ export function ChatThread({
             {t('chat.replyingTo')}{' '}
             <span className="text-slate-700">{replyTo.body || t('chat.attachmentWord')}</span>
           </span>
-          <button onClick={() => setReplyTo(null)} className="ml-2 text-slate-400 hover:text-slate-600">
+          <button onClick={() => setReplyTo(null)} className="ms-2 text-slate-400 hover:text-slate-600">
             ✕
           </button>
         </div>
@@ -363,7 +363,7 @@ export function ChatThread({
               setFile(null);
               setAttachError(null);
             }}
-            className="ml-2 text-slate-400 hover:text-slate-600"
+            className="ms-2 text-slate-400 hover:text-slate-600"
           >
             ✕
           </button>
@@ -373,7 +373,7 @@ export function ChatThread({
       {/* Composer */}
       <div className="relative flex items-end gap-1.5 border-t border-slate-200 p-2">
         {showEmoji && (
-          <div className="absolute bottom-14 left-2 z-10 flex flex-wrap gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-elevated">
+          <div className="absolute bottom-14 start-2 z-10 flex flex-wrap gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-elevated">
             {EMOJIS.map((e) => (
               <button
                 key={e}
