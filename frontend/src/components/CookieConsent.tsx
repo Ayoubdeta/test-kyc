@@ -44,7 +44,7 @@ export function CookieConsent() {
         <p className="flex-1 text-sm text-slate-600">
           {t('cookie.message')}{' '}
           <a
-            href="https://decalesp.com/"
+            href="https://decalesp.com/cookies/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-brand-600 underline hover:text-brand-700"
