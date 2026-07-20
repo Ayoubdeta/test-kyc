@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
+import { CookieConsent } from './components/CookieConsent';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AuthProvider } from './context/AuthContext';
 import { I18nProvider } from './i18n';
@@ -36,6 +37,9 @@ createRoot(rootElement).render(
             <ErrorBoundary>
               <App />
             </ErrorBoundary>
+            {/* Aviso de cookies (parte inferior); fuera del ErrorBoundary de la
+                app para que se muestre aunque una página falle al renderizar. */}
+            <CookieConsent />
           </I18nProvider>
         </AuthProvider>
       </BrowserRouter>
