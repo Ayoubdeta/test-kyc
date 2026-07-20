@@ -5,6 +5,7 @@ import { formatDate, formatDateTime } from '../lib/format';
 import type { ChatMessage } from '../types';
 import { ChatAttachmentView } from './ChatAttachmentView';
 import { SearchIcon } from './icons';
+import { Alert } from './ui/Alert';
 
 interface SendPayload {
   body: string;
@@ -58,6 +59,7 @@ export function ChatThread({
   const { t } = useI18n();
   const [draft, setDraft] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [attachError, setAttachError] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState('');
@@ -110,9 +112,10 @@ export function ChatThread({
   const pickFile = (f: File | null) => {
     if (!f) return;
     if (f.size > MAX_ATTACH_MB * 1024 * 1024) {
-      alert(t('chat.attachTooLarge', { mb: MAX_ATTACH_MB }));
+      setAttachError(t('chat.attachTooLarge', { mb: MAX_ATTACH_MB }));
       return;
     }
+    setAttachError(null);
     setFile(f);
   };
 
@@ -344,11 +347,24 @@ export function ChatThread({
         </div>
       )}
 
+      {/* Error de adjunto (p. ej. demasiado grande) */}
+      {attachError && (
+        <div className="border-t border-slate-200 px-3 py-2">
+          <Alert>{attachError}</Alert>
+        </div>
+      )}
+
       {/* Adjunto seleccionado */}
       {file && (
         <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
           <span className="min-w-0 truncate text-slate-600">{t('chat.attachmentLabel')} {file.name}</span>
-          <button onClick={() => setFile(null)} className="ml-2 text-slate-400 hover:text-slate-600">
+          <button
+            onClick={() => {
+              setFile(null);
+              setAttachError(null);
+            }}
+            className="ml-2 text-slate-400 hover:text-slate-600"
+          >
             ✕
           </button>
         </div>

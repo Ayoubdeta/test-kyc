@@ -1,6 +1,23 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { ZodTypeAny } from 'zod';
+import { z, type ZodTypeAny } from 'zod';
 import { AppError } from '../utils/AppError';
+
+const uuidSchema = z.string().uuid();
+
+/**
+ * Valida que un parámetro de ruta sea un UUID válido. Sin esto, un `:id` mal
+ * formado llega a un `WHERE id = $1` sobre una columna uuid y Postgres lanza un
+ * error de sintaxis que acaba en un 500 genérico; con esto se corta antes con un
+ * 400 limpio. Todas las PK del proyecto son UUID.
+ */
+export function validateParamUuid(param = 'id') {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (!uuidSchema.safeParse(req.params[param]).success) {
+      throw new AppError(400, 'Identificador inválido');
+    }
+    next();
+  };
+}
 
 /**
  * Middleware genérico de validación. Valida y NORMALIZA el body contra un

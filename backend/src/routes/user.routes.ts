@@ -3,7 +3,7 @@ import { ROLES } from '../config/constants';
 import { userController } from '../controllers/user.controller';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { requireRole } from '../middlewares/role.middleware';
-import { validateBody } from '../middlewares/validate.middleware';
+import { validateBody, validateParamUuid } from '../middlewares/validate.middleware';
 import { asyncHandler } from '../utils/asyncHandler';
 import { updateProfileSchema } from '../validators/profile.validators';
 import {
@@ -53,12 +53,18 @@ router.post(
   asyncHandler(userController.createClient),
 );
 
-router.get('/:id', requireRole(ROLES.ADMIN), asyncHandler(userController.getById));
+router.get(
+  '/:id',
+  requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
+  asyncHandler(userController.getById),
+);
 
 // Edición completa (cuenta + perfil + rol).
 router.patch(
   '/:id',
   requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
   jsonSmall,
   validateBody(adminUpdateUserSchema),
   asyncHandler(userController.adminUpdate),
@@ -68,12 +74,18 @@ router.patch(
 router.post(
   '/:id/reset-password',
   requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
   jsonSmall,
   validateBody(resetPasswordSchema),
   asyncHandler(userController.resetPassword),
 );
 
 // Eliminar usuario.
-router.delete('/:id', requireRole(ROLES.ADMIN), asyncHandler(userController.remove));
+router.delete(
+  '/:id',
+  requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
+  asyncHandler(userController.remove),
+);
 
 export default router;

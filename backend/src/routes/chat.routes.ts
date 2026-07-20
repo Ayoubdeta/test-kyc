@@ -4,7 +4,7 @@ import { chatController } from '../controllers/chat.controller';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { uploadChatAttachment } from '../middlewares/chatUpload.middleware';
 import { requireRole } from '../middlewares/role.middleware';
-import { validateBody } from '../middlewares/validate.middleware';
+import { validateBody, validateParamUuid } from '../middlewares/validate.middleware';
 import { asyncHandler } from '../utils/asyncHandler';
 import { editMessageSchema, reactSchema } from '../validators/chat.validators';
 
@@ -42,17 +42,20 @@ router.get(
 router.get(
   '/conversations/:clientId',
   requireRole(...REVIEW_ROLES),
+  validateParamUuid('clientId'),
   asyncHandler(chatController.conversationMessages),
 );
 router.post(
   '/conversations/:clientId',
   requireRole(...REVIEW_ROLES),
+  validateParamUuid('clientId'),
   uploadChatAttachment,
   asyncHandler(chatController.sendToClient),
 );
 router.post(
   '/conversations/:clientId/typing',
   requireRole(...REVIEW_ROLES),
+  validateParamUuid('clientId'),
   asyncHandler(chatController.typingToClient),
 );
 
@@ -62,19 +65,27 @@ const anyChatRole = [ROLES.CLIENTE, ...REVIEW_ROLES];
 router.get(
   '/attachments/:id',
   requireRole(...anyChatRole),
+  validateParamUuid('id'),
   asyncHandler(chatController.downloadAttachment),
 );
 router.patch(
   '/messages/:id',
   requireRole(...anyChatRole),
+  validateParamUuid('id'),
   jsonBody,
   validateBody(editMessageSchema),
   asyncHandler(chatController.edit),
 );
-router.delete('/messages/:id', requireRole(...anyChatRole), asyncHandler(chatController.remove));
+router.delete(
+  '/messages/:id',
+  requireRole(...anyChatRole),
+  validateParamUuid('id'),
+  asyncHandler(chatController.remove),
+);
 router.post(
   '/messages/:id/react',
   requireRole(...anyChatRole),
+  validateParamUuid('id'),
   jsonBody,
   validateBody(reactSchema),
   asyncHandler(chatController.react),

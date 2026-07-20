@@ -13,6 +13,7 @@ import { documentEventRepository } from '../repositories/documentEvent.repositor
 import { userRepository } from '../repositories/user.repository';
 import type { PublicDocument, PublicDocumentEvent } from '../types';
 import { AppError } from '../utils/AppError';
+import { hasValidSignature } from '../utils/fileSignature';
 import { fileStorage } from '../utils/storage';
 import { docTypeLabel, toPublicDocument, toPublicDocumentEvent } from '../utils/mappers';
 import type { DecisionInput, ReviewInput } from '../validators/document.validators';
@@ -35,6 +36,13 @@ export const documentService = {
     docType: DocumentTypeKey,
     file: Express.Multer.File,
   ): Promise<PublicDocument> {
+    // El fileFilter de multer ya comprueba el MIME declarado; aquí verificamos
+    // que el CONTENIDO real sea de verdad un PDF (magic bytes), no un fichero
+    // arbitrario renombrado.
+    if (!hasValidSignature(file.buffer, file.mimetype)) {
+      throw AppError.badRequest('El archivo no es un PDF válido');
+    }
+
     const existing = await documentRepository.findByUserAndType(userId, docType);
     if (existing) {
       await fileStorage.remove(existing.stored_name);

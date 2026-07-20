@@ -495,3 +495,17 @@ ALTER TABLE documents ADD COLUMN IF NOT EXISTS validity_months INTEGER;
 ALTER TABLE documents DROP CONSTRAINT IF EXISTS chk_documents_validity_months;
 ALTER TABLE documents ADD CONSTRAINT chk_documents_validity_months
     CHECK (validity_months IS NULL OR (validity_months >= 1 AND validity_months <= 120));
+
+-- ════════════════════════════════════════════════════════════════
+--  13 · Índices en claves foráneas y columnas de filtro
+-- ════════════════════════════════════════════════════════════════
+
+CREATE INDEX IF NOT EXISTS idx_notifications_document_id ON notifications(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_events_document_id ON document_events(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_events_actor_id ON document_events(actor_id);
+CREATE INDEX IF NOT EXISTS idx_documents_reviewed_by ON documents(reviewed_by);
+CREATE INDEX IF NOT EXISTS idx_documents_decided_by ON documents(decided_by);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_sender_id ON chat_messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_reply_to_id ON chat_messages(reply_to_id);
+CREATE INDEX IF NOT EXISTS idx_client_profiles_expediente_status
+    ON client_profiles(expediente_status);

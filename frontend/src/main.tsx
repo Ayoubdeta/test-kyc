@@ -9,10 +9,15 @@ import { I18nProvider } from './i18n';
 import './index.css';
 
 // Cliente de React Query: gestiona el estado del servidor (caché, reintentos).
+// staleTime evita que cada montaje de página vuelva a pedir datos que cambian
+// poco (documentos, KPIs, logs). retry acotado para no insistir en errores
+// definitivos (p. ej. 4xx) más de una vez.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      staleTime: 30_000,
+      retry: 1,
     },
   },
 });

@@ -4,7 +4,7 @@ import { documentController } from '../controllers/document.controller';
 import { requireAuth } from '../middlewares/auth.middleware';
 import { requireRole } from '../middlewares/role.middleware';
 import { uploadDocument } from '../middlewares/upload.middleware';
-import { validateBody } from '../middlewares/validate.middleware';
+import { validateBody, validateParamUuid } from '../middlewares/validate.middleware';
 import { asyncHandler } from '../utils/asyncHandler';
 import { decisionSchema, reviewSchema } from '../validators/document.validators';
 
@@ -33,10 +33,16 @@ router.get('/history', requireRole(ROLES.CLIENTE), asyncHandler(documentControll
 router.get('/', requireRole(...STAFF_ROLES), asyncHandler(documentController.listAll));
 
 // Documentos e historial de un usuario concreto (admin, panel de usuarios).
-router.get('/user/:id', requireRole(ROLES.ADMIN), asyncHandler(documentController.listUserDocuments));
+router.get(
+  '/user/:id',
+  requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
+  asyncHandler(documentController.listUserDocuments),
+);
 router.get(
   '/user/:id/history',
   requireRole(ROLES.ADMIN),
+  validateParamUuid('id'),
   asyncHandler(documentController.userHistory),
 );
 
@@ -44,6 +50,7 @@ router.get(
 router.patch(
   '/:id/start-review',
   requireRole(...REVIEW_ROLES),
+  validateParamUuid('id'),
   asyncHandler(documentController.startReview),
 );
 
@@ -51,6 +58,7 @@ router.patch(
 router.patch(
   '/:id/review',
   requireRole(...REVIEW_ROLES),
+  validateParamUuid('id'),
   express.json({ limit: '10kb' }),
   validateBody(reviewSchema),
   asyncHandler(documentController.review),
@@ -60,12 +68,13 @@ router.patch(
 router.patch(
   '/:id/decision',
   requireRole(...APPROVAL_ROLES),
+  validateParamUuid('id'),
   express.json({ limit: '10kb' }),
   validateBody(decisionSchema),
   asyncHandler(documentController.decide),
 );
 
 // ─── Descarga (propietario o personal; la autorización fina va en el service) ──
-router.get('/:id/download', asyncHandler(documentController.download));
+router.get('/:id/download', validateParamUuid('id'), asyncHandler(documentController.download));
 
 export default router;

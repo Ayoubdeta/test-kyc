@@ -6,6 +6,7 @@ import { EXT_BY_MIME } from '../middlewares/chatUpload.middleware';
 import { chatService, type OutgoingAttachment } from '../services/chat.service';
 import { AppError } from '../utils/AppError';
 import { chatBus, type ChatEvent } from '../utils/chatBus';
+import { hasValidSignature } from '../utils/fileSignature';
 import { fileStorage } from '../utils/storage';
 
 // Rol de chat del usuario autenticado: el cliente escribe como 'cliente';
@@ -18,6 +19,11 @@ function senderRoleOf(req: Request): ChatSender {
 // clave "<clientId>/chat/<random>.<ext>" y devuelve sus metadatos para persistir.
 async function attachmentFrom(req: Request, clientId: string): Promise<OutgoingAttachment | null> {
   if (!req.file) return null;
+  // El fileFilter valida el MIME declarado; aquí verificamos que el contenido
+  // real coincida (magic bytes), no un fichero arbitrario renombrado.
+  if (!hasValidSignature(req.file.buffer, req.file.mimetype)) {
+    throw AppError.badRequest('El adjunto no coincide con su tipo (PDF, PNG, JPG o WEBP)');
+  }
   const ext = EXT_BY_MIME[req.file.mimetype] ?? 'bin';
   const stored = `${clientId}/chat/${crypto.randomBytes(16).toString('hex')}.${ext}`;
   await fileStorage.uploadBuffer(stored, req.file.buffer, req.file.mimetype);

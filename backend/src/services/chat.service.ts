@@ -1,4 +1,4 @@
-import { CHAT_SENDER, type ChatSender } from '../config/constants';
+import { CHAT_MESSAGE_MAX, CHAT_SENDER, type ChatSender } from '../config/constants';
 import { chatRepository } from '../repositories/chat.repository';
 import { userRepository } from '../repositories/user.repository';
 import type { ChatMessageWithMetaRow, PublicChatConversation, PublicChatMessage } from '../types';
@@ -20,10 +20,16 @@ export interface SendInput {
   attachment?: OutgoingAttachment | null;
 }
 
-// Un mensaje debe llevar texto o adjunto (o ambos): no permitimos vacíos.
-function ensureNotEmpty(input: SendInput): void {
-  if (input.body.trim() === '' && !input.attachment) {
+// Un mensaje debe llevar texto o adjunto (o ambos): no permitimos vacíos. El
+// texto (opcional si hay adjunto) tiene longitud acotada, igual que en la
+// edición (el envío es multipart y no pasa por validateBody con el schema).
+function ensureValidBody(input: SendInput): void {
+  const body = input.body.trim();
+  if (body === '' && !input.attachment) {
     throw AppError.badRequest('El mensaje no puede estar vacío');
+  }
+  if (body.length > CHAT_MESSAGE_MAX) {
+    throw AppError.badRequest(`El mensaje no puede superar ${CHAT_MESSAGE_MAX} caracteres`);
   }
 }
 
@@ -47,7 +53,7 @@ export const chatService = {
   },
 
   async sendAsClient(clientId: string, input: SendInput): Promise<PublicChatMessage> {
-    ensureNotEmpty(input);
+    ensureValidBody(input);
     const replyToId = await resolveReplyTo(clientId, input.replyToId);
     const row = await chatRepository.create({
       clientId,
@@ -83,7 +89,7 @@ export const chatService = {
   },
 
   async sendAsStaff(clientId: string, staffId: string, input: SendInput): Promise<PublicChatMessage> {
-    ensureNotEmpty(input);
+    ensureValidBody(input);
     const client = await userRepository.findById(clientId);
     if (!client || client.role !== 'cliente') {
       throw AppError.notFound('Cliente no encontrado');
