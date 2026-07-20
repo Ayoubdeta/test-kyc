@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { logsApi } from '../api/logs.api';
 import { InboxIcon, SearchIcon } from '../components/icons';
+import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
 import { logActionLabel, roleLabel } from '../i18n/labels';
@@ -19,7 +20,7 @@ export function LogsPage() {
   const [applied, setApplied] = useState<LogFilters>(EMPTY_FILTERS);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['logs', applied, page],
     queryFn: () => logsApi.list({ ...applied, page, pageSize: PAGE_SIZE }),
     placeholderData: (prev) => prev, // evita parpadeo al paginar
@@ -111,7 +112,9 @@ export function LogsPage() {
         </div>
       </div>
 
-      {isLoading || !data ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading || !data ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-4">

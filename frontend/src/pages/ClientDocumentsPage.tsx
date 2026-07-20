@@ -5,6 +5,7 @@ import { documentsApi } from '../api/documents.api';
 import { StatusBadge } from '../components/Badge';
 import { DocTypeIcon } from '../components/icons';
 import { PdfViewerModal } from '../components/PdfViewerModal';
+import { QueryError } from '../components/QueryError';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { usePdfPreview } from '../hooks/usePdfPreview';
@@ -26,7 +27,7 @@ export function ClientDocumentsPage() {
   const [uploadingType, setUploadingType] = useState<DocumentTypeKey | null>(null);
   const preview = usePdfPreview();
 
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, isError, refetch } = useQuery({
     queryKey: DOCS_KEY,
     queryFn: documentsApi.listMine,
   });
@@ -90,7 +91,9 @@ export function ClientDocumentsPage() {
         </div>
       )}
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">

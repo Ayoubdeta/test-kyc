@@ -8,7 +8,7 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 // a "en revisión"; desde ahí se envían a aprobación de Dirección o se cancelan.
 export function PendingReviewDocumentsPage() {
   const { t } = useI18n();
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, isError, refetch } = useQuery({
     queryKey: DOCS_ALL_KEY,
     queryFn: documentsApi.listAll,
   });
@@ -25,6 +25,8 @@ export function PendingReviewDocumentsPage() {
       <DocumentReviewList
         documents={pending}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
         allowReviewActions
         allowDecision={false}
         emptyText={t('review.emptyPending')}

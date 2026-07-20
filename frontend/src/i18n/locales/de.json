@@ -1,5 +1,10 @@
 {
   "common.loading": "Wird geladen…",
+  "common.loadError": "Daten konnten nicht geladen werden",
+  "common.retry": "Erneut versuchen",
+  "common.appError": "Etwas ist schiefgelaufen",
+  "common.appErrorHint": "Ein unerwarteter Fehler ist aufgetreten. Laden Sie die Seite neu, um fortzufahren.",
+  "common.reload": "Neu laden",
   "common.save": "Änderungen speichern",
   "common.cancel": "Abbrechen",
   "common.role": "Rolle",

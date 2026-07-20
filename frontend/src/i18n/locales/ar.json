@@ -1,5 +1,10 @@
 {
   "common.loading": "جارٍ التحميل…",
+  "common.loadError": "تعذّر تحميل البيانات",
+  "common.retry": "إعادة المحاولة",
+  "common.appError": "حدث خطأ ما",
+  "common.appErrorHint": "حدث خطأ غير متوقع. أعد تحميل الصفحة للمتابعة.",
+  "common.reload": "إعادة التحميل",
   "common.save": "حفظ التغييرات",
   "common.cancel": "إلغاء",
   "common.role": "الدور",

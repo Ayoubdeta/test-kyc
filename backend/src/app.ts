@@ -10,6 +10,12 @@ import routes from './routes';
 export function createApp() {
   const app = express();
 
+  // Detrás de un proxy (Vercel, Supabase, cualquier balanceador) la IP real del
+  // cliente llega en `X-Forwarded-For`. Sin esto, `req.ip` sería la del proxy y
+  // el rate limiting agruparía a TODOS los clientes en un único bucket (protección
+  // anti-fuerza-bruta inservible). Confiamos en 1 salto de proxy.
+  app.set('trust proxy', 1);
+
   // El orden de los middlewares importa: seguridad y parseo primero, luego
   // rate limiting, después las rutas y, al final, el manejo de errores.
 

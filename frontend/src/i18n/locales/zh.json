@@ -1,5 +1,10 @@
 {
   "common.loading": "加载中…",
+  "common.loadError": "无法加载数据",
+  "common.retry": "重试",
+  "common.appError": "出错了",
+  "common.appErrorHint": "发生意外错误。请重新加载页面以继续。",
+  "common.reload": "重新加载",
   "common.save": "保存更改",
   "common.cancel": "取消",
   "common.role": "角色",

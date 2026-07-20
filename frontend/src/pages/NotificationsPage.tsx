@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { notificationsApi } from '../api/notifications.api';
 import { LIST_KEY, UNREAD_KEY } from '../components/NotificationBell';
 import { NotificationIcon } from '../components/icons';
+import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -13,7 +14,7 @@ export function NotificationsPage() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isLoading } = useQuery({
+  const { data: notifications = [], isLoading, isError, refetch } = useQuery({
     queryKey: LIST_KEY,
     queryFn: notificationsApi.list,
   });
@@ -49,7 +50,9 @@ export function NotificationsPage() {
         )}
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : notifications.length === 0 ? (
         <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">

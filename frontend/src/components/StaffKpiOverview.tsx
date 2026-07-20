@@ -5,6 +5,7 @@ import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { canApprove, STATUS_HEX } from '../lib/roles';
 import { BarChart, DonutChart, KpiCard, TrendBars } from './charts/Charts';
+import { QueryError } from './QueryError';
 import {
   AlertTriangleIcon,
   CheckCircleIcon,
@@ -24,10 +25,18 @@ export function StaffKpiOverview() {
   const { t: tr } = useI18n();
   const isDireccion = canApprove(me?.user.role);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: OVERVIEW_KEY,
     queryFn: statsApi.overview,
   });
+
+  if (isError) {
+    return (
+      <div className="mb-6">
+        <QueryError onRetry={() => refetch()} />
+      </div>
+    );
+  }
 
   if (isLoading || !data) {
     return (

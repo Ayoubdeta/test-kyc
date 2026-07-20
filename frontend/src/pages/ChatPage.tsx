@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { chatApi, type SendPayload } from '../api/chat.api';
 import { ChatThread } from '../components/ChatThread';
+import { QueryError } from '../components/QueryError';
 import { useChatStream } from '../hooks/useChatStream';
 import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -19,7 +20,7 @@ export function ChatPage() {
   const selectedRef = useRef<string | null>(null);
   selectedRef.current = selected;
 
-  const { data: conversations = [], isLoading } = useQuery({
+  const { data: conversations = [], isLoading, isError, refetch } = useQuery({
     queryKey: CONV_KEY,
     queryFn: chatApi.conversations,
     refetchInterval: 30_000,
@@ -97,7 +98,11 @@ export function ChatPage() {
           <div className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
             {t('chat.conversations')}
           </div>
-          {isLoading ? (
+          {isError ? (
+            <div className="p-4">
+              <QueryError onRetry={() => refetch()} />
+            </div>
+          ) : isLoading ? (
             <p className="p-4 text-sm text-slate-500">{t('common.loading')}</p>
           ) : conversations.length === 0 ? (
             <p className="p-4 text-sm text-slate-500">{t('chat.noConversations')}</p>

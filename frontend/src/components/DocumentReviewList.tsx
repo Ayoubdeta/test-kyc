@@ -9,6 +9,7 @@ import { formatBytes, formatDate, formatDateTime } from '../lib/format';
 import type { DocumentItem } from '../types';
 import { StatusBadge } from './Badge';
 import { PdfViewerModal } from './PdfViewerModal';
+import { QueryError } from './QueryError';
 import { Alert } from './ui/Alert';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -40,6 +41,10 @@ interface Props {
   /** Muestra Aprobar/Rechazar en documentos pendientes de aprobación (Dirección). */
   allowDecision: boolean;
   isLoading?: boolean;
+  /** La consulta de documentos falló (muestra el estado de error con reintento). */
+  isError?: boolean;
+  /** Reintenta la consulta de documentos. */
+  onRetry?: () => void;
   emptyText?: string;
 }
 
@@ -54,6 +59,8 @@ export function DocumentReviewList({
   allowReviewActions,
   allowDecision,
   isLoading = false,
+  isError = false,
+  onRetry,
   emptyText,
 }: Props) {
   const { t } = useI18n();
@@ -178,6 +185,10 @@ export function DocumentReviewList({
     };
     decisionMutation.mutate({ id: decisionTarget.doc.id, payload });
   };
+
+  if (isError) {
+    return <QueryError onRetry={onRetry} />;
+  }
 
   if (isLoading) {
     return <p className="text-sm text-slate-500">{t('common.loading')}</p>;

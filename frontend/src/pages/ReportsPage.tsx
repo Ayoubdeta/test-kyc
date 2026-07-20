@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { reportsApi } from '../api/reports.api';
 import { FileTextIcon, InboxIcon, SearchIcon } from '../components/icons';
+import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
 import { docTypeLabel, statusLabel } from '../i18n/labels';
@@ -35,7 +36,7 @@ export function ReportsPage() {
     { header: t('rep.csvReason'), value: (r) => r.comment ?? '' },
   ];
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['reports', 'documents', applied],
     queryFn: () => reportsApi.documents(applied),
   });
@@ -161,7 +162,9 @@ export function ReportsPage() {
         </div>
       </div>
 
-      {isLoading || !data ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading || !data ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-4">

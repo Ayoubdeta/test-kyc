@@ -1,7 +1,0 @@
-admin
-Admin_Demo_2026
-
-Admin	admin@kyc.local	Admin_Demo_2026
-Compliance	ana@test.com	Ana_Demo_2026
-Dirección	direccion@test.com	Direccion_Demo_2026
-Cliente	juan@test.com	Juan_Demo_2026

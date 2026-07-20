@@ -1,5 +1,10 @@
 {
   "common.loading": "Loading…",
+  "common.loadError": "Couldn't load the data",
+  "common.retry": "Retry",
+  "common.appError": "Something went wrong",
+  "common.appErrorHint": "An unexpected error occurred. Reload the page to continue.",
+  "common.reload": "Reload",
   "common.save": "Save changes",
   "common.cancel": "Cancel",
   "common.role": "Role",

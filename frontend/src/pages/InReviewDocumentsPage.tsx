@@ -8,7 +8,7 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 // enviarlos a aprobación de Dirección o cancelarlos.
 export function InReviewDocumentsPage() {
   const { t } = useI18n();
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, isError, refetch } = useQuery({
     queryKey: DOCS_ALL_KEY,
     queryFn: documentsApi.listAll,
   });
@@ -25,6 +25,8 @@ export function InReviewDocumentsPage() {
       <DocumentReviewList
         documents={inReview}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
         allowReviewActions
         allowDecision={false}
         emptyText={t('review.emptyInReview')}

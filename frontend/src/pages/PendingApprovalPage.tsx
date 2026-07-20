@@ -8,7 +8,7 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 // revisaron y enviaron a aprobación (estado "pendiente_aprobacion").
 export function PendingApprovalPage() {
   const { t } = useI18n();
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, isError, refetch } = useQuery({
     queryKey: DOCS_ALL_KEY,
     queryFn: documentsApi.listAll,
   });
@@ -25,6 +25,8 @@ export function PendingApprovalPage() {
       <DocumentReviewList
         documents={pending}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
         allowReviewActions={false}
         allowDecision
         emptyText={t('review.emptyApprovals')}

@@ -4,6 +4,7 @@ import { adminApi } from '../api/admin.api';
 import { AdminUserEditModal } from '../components/AdminUserEditModal';
 import { RoleBadge } from '../components/Badge';
 import { CreateClientModal } from '../components/CreateClientModal';
+import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -18,7 +19,7 @@ export function AdminUsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: users = [], isLoading, isError, refetch } = useQuery({
     queryKey: USERS_KEY,
     queryFn: adminApi.listUsers,
   });
@@ -33,6 +34,9 @@ export function AdminUsersPage() {
         <Button onClick={() => setCreating(true)}>{t('admin.createClient')}</Button>
       </div>
 
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : (
       <div className="animate-fade-in-up overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-card">
         {isLoading ? (
           <p className="p-6 text-sm text-slate-500">{t('common.loading')}</p>
@@ -73,6 +77,7 @@ export function AdminUsersPage() {
           </table>
         )}
       </div>
+      )}
 
       {editingId && (
         <AdminUserEditModal

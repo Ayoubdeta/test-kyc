@@ -1,5 +1,10 @@
 {
   "common.loading": "Cargando…",
+  "common.loadError": "No se pudieron cargar los datos",
+  "common.retry": "Reintentar",
+  "common.appError": "Algo ha salido mal",
+  "common.appErrorHint": "Se ha producido un error inesperado. Recarga la página para continuar.",
+  "common.reload": "Recargar",
   "common.save": "Guardar cambios",
   "common.cancel": "Cancelar",
   "common.role": "Rol",

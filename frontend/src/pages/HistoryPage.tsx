@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { documentsApi } from '../api/documents.api';
 import { EventIcon, FolderIcon } from '../components/icons';
+import { QueryError } from '../components/QueryError';
 import { useI18n } from '../i18n';
 import { docTypeLabel, eventLabel } from '../i18n/labels';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -26,7 +27,7 @@ export function HistoryPage() {
     { key: 'caducado', label: t('history.filterExpired') },
   ];
 
-  const { data: events = [], isLoading } = useQuery({
+  const { data: events = [], isLoading, isError, refetch } = useQuery({
     queryKey: HISTORY_KEY,
     queryFn: documentsApi.history,
   });
@@ -65,7 +66,9 @@ export function HistoryPage() {
         })}
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : filtered.length === 0 ? (
         <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">

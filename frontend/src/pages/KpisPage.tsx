@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { statsApi } from '../api/stats.api';
 import { BarChart, DonutChart, KpiCard, TrendBars } from '../components/charts/Charts';
+import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
 import { docTypeLabel, statusLabel } from '../i18n/labels';
@@ -24,7 +25,7 @@ export function KpisPage() {
   const [draft, setDraft] = useState<StatsFilters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<StatsFilters>(EMPTY_FILTERS);
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['stats', 'filtered', applied],
     queryFn: () => statsApi.filtered(applied),
   });
@@ -130,7 +131,9 @@ export function KpisPage() {
         </div>
       </div>
 
-      {isLoading || !data ? (
+      {isError ? (
+        <QueryError onRetry={() => refetch()} />
+      ) : isLoading || !data ? (
         <p className="text-sm text-slate-500">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-6">

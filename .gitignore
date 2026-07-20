@@ -10,6 +10,10 @@ node_modules/
 # Ficheros subidos en local (KYC + adjuntos de chat)
 uploads/
 
+# Credenciales / notas locales (¡nunca versionar!)
+credenciales.txt
+test.txt
+
 # Vercel
 .vercel
 

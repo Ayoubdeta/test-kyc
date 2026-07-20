@@ -1,5 +1,10 @@
 {
   "common.loading": "Carregant…",
+  "common.loadError": "No s'han pogut carregar les dades",
+  "common.retry": "Torna-ho a provar",
+  "common.appError": "Alguna cosa ha anat malament",
+  "common.appErrorHint": "S'ha produït un error inesperat. Torna a carregar la pàgina per continuar.",
+  "common.reload": "Torna a carregar",
   "common.save": "Desa els canvis",
   "common.cancel": "Cancel·la",
   "common.role": "Rol",

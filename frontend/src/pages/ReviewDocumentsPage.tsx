@@ -11,7 +11,7 @@ export function ReviewDocumentsPage() {
   const { t } = useI18n();
   const role = me?.user.role;
 
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, isError, refetch } = useQuery({
     queryKey: DOCS_ALL_KEY,
     queryFn: documentsApi.listAll,
   });
@@ -30,6 +30,8 @@ export function ReviewDocumentsPage() {
       <DocumentReviewList
         documents={documents}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
         allowReviewActions={canReview(role)}
         allowDecision={canApprove(role)}
         emptyText={t('review.emptyAll')}
