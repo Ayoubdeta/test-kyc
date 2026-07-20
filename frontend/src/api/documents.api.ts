@@ -49,11 +49,18 @@ export const documentsApi = {
     return data.document;
   },
 
-  /** Compliance/Admin: tras revisar, envía a aprobación de Dirección. */
-  async sendToApproval(id: string, comment?: string): Promise<DocumentItem> {
+  /**
+   * Compliance/Admin: tras revisar, envía a aprobación de Dirección proponiendo
+   * la validez (meses). Dirección podrá ajustarla al aprobar.
+   */
+  async sendToApproval(
+    id: string,
+    validityMonths: number,
+    comment?: string,
+  ): Promise<DocumentItem> {
     const { data } = await api.patch<{ document: DocumentItem }>(
       `/documents/${id}/review`,
-      { action: 'enviar_aprobacion', comment },
+      { action: 'enviar_aprobacion', validityMonths, comment },
     );
     return data.document;
   },

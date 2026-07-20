@@ -485,3 +485,13 @@ ALTER TABLE profiles
 ALTER TABLE profiles DROP CONSTRAINT IF EXISTS chk_profiles_language;
 ALTER TABLE profiles ADD CONSTRAINT chk_profiles_language
     CHECK (language IN ('es', 'ca', 'en', 'de', 'fr', 'ar', 'zh'));
+
+-- ════════════════════════════════════════════════════════════════
+--  12 · Validez (meses) propuesta por el revisor al enviar a aprobación
+-- ════════════════════════════════════════════════════════════════
+
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS validity_months INTEGER;
+
+ALTER TABLE documents DROP CONSTRAINT IF EXISTS chk_documents_validity_months;
+ALTER TABLE documents ADD CONSTRAINT chk_documents_validity_months
+    CHECK (validity_months IS NULL OR (validity_months >= 1 AND validity_months <= 120));

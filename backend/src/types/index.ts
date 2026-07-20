@@ -71,6 +71,8 @@ export interface DocumentRow {
   decided_by: string | null;
   decided_at: Date | null;
   expires_at: Date | null;
+  /** Validez (meses) propuesta por el revisor al enviar a aprobación. */
+  validity_months: number | null;
   uploaded_at: Date;
 }
 
@@ -104,6 +106,8 @@ export interface PublicDocument {
   reviewedAt: string | null;
   decidedAt: string | null;
   expiresAt: string | null;
+  /** Validez (meses) propuesta al enviar a aprobación (la caducidad se calcula al aprobar). */
+  validityMonths: number | null;
   uploadedAt: string;
   owner?: {
     id: string;

@@ -83,6 +83,7 @@ export function toPublicDocument(
     reviewedAt: row.reviewed_at ? row.reviewed_at.toISOString() : null,
     decidedAt: row.decided_at ? row.decided_at.toISOString() : null,
     expiresAt: row.expires_at ? row.expires_at.toISOString() : null,
+    validityMonths: row.validity_months,
     uploadedAt: row.uploaded_at.toISOString(),
   };
 

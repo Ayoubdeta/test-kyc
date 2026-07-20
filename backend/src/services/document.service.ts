@@ -211,10 +211,13 @@ export const documentService = {
       return toPublicDocument(updated);
     }
 
-    // action === 'enviar_aprobacion'
+    // action === 'enviar_aprobacion'. El revisor propone la validez (meses); se
+    // guarda en el documento para calcular la caducidad cuando Dirección apruebe.
+    // El validador garantiza que viene informada; se usa 12 como red de seguridad.
     const updated = await documentRepository.sendToApproval(documentId, {
       reviewerId,
       comment: note,
+      validityMonths: input.validityMonths ?? 12,
     });
     if (!updated) {
       throw AppError.notFound('Documento no encontrado');
@@ -269,11 +272,15 @@ export const documentService = {
 
     const approving = input.status === DOCUMENT_STATUS.APPROVED;
 
+    // La validez la propuso el revisor al enviar a aprobación (`validity_months`);
+    // Dirección puede ajustarla ahora (`input.validityMonths`). Si por lo que sea
+    // no hubiera ninguna, se usa 12 meses. La caducidad cuenta desde la aprobación.
     let expiresAt: Date | null = null;
+    let validityMonths: number | null = null;
     if (approving) {
-      const months = input.validityMonths ?? 12;
+      validityMonths = input.validityMonths ?? existing.validity_months ?? 12;
       const d = new Date();
-      d.setMonth(d.getMonth() + months);
+      d.setMonth(d.getMonth() + validityMonths);
       expiresAt = d;
     }
 
@@ -284,6 +291,7 @@ export const documentService = {
       comment,
       deciderId,
       expiresAt,
+      validityMonths,
     });
     if (!updated) {
       throw AppError.notFound('Documento no encontrado');

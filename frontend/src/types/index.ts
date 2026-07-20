@@ -75,6 +75,8 @@ export interface DocumentItem {
   reviewedAt: string | null;
   decidedAt: string | null;
   expiresAt: string | null;
+  /** Validez (meses) propuesta al enviar a aprobación; Dirección puede ajustarla. */
+  validityMonths: number | null;
   uploadedAt: string;
   owner?: {
     id: string;

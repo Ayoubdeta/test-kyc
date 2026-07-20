@@ -75,6 +75,8 @@ export function DocumentReviewList({
 
   const [reviewTarget, setReviewTarget] = useState<ReviewTarget>(null);
   const [reviewComment, setReviewComment] = useState('');
+  // Validez (meses) que propone el revisor al enviar a aprobación.
+  const [reviewValidityMonths, setReviewValidityMonths] = useState(12);
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: DOCS_ALL_KEY });
 
@@ -87,10 +89,20 @@ export function DocumentReviewList({
 
   // Decisión de compliance/admin sobre un documento en revisión.
   const reviewMutation = useMutation({
-    mutationFn: ({ id, action, comment }: { id: string; action: ReviewAction; comment?: string }) =>
+    mutationFn: ({
+      id,
+      action,
+      comment,
+      validityMonths,
+    }: {
+      id: string;
+      action: ReviewAction;
+      comment?: string;
+      validityMonths: number;
+    }) =>
       action === 'cancelar'
         ? documentsApi.cancelReview(id, comment)
-        : documentsApi.sendToApproval(id, comment),
+        : documentsApi.sendToApproval(id, validityMonths, comment),
     onSuccess: async () => {
       await invalidate();
       setReviewTarget(null);
@@ -157,13 +169,15 @@ export function DocumentReviewList({
   const openDecision = (doc: DocumentItem, status: 'aprobado' | 'rechazado') => {
     setError(null);
     setDecisionComment('');
-    setValidityMonths(12);
+    // Precarga la validez propuesta por el revisor; Dirección puede ajustarla.
+    setValidityMonths(doc.validityMonths ?? 12);
     setDecisionTarget({ doc, status });
   };
 
   const openReview = (doc: DocumentItem, action: ReviewAction) => {
     setError(null);
     setReviewComment('');
+    setReviewValidityMonths(doc.validityMonths ?? 12);
     setReviewTarget({ doc, action });
   };
 
@@ -173,6 +187,7 @@ export function DocumentReviewList({
       id: reviewTarget.doc.id,
       action: reviewTarget.action,
       comment: reviewComment.trim() || undefined,
+      validityMonths: reviewValidityMonths,
     });
   };
 
@@ -353,6 +368,26 @@ export function DocumentReviewList({
               ? t('list.cancelDesc')
               : t('list.sendApprovalDesc')}
           </p>
+
+          {reviewTarget?.action === 'enviar_aprobacion' && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="reviewValidity" className="text-sm font-medium text-slate-700">
+                {t('list.validity')}
+              </label>
+              <select
+                id="reviewValidity"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                value={reviewValidityMonths}
+                onChange={(e) => setReviewValidityMonths(Number(e.target.value))}
+              >
+                {VALIDITY_MONTHS.map((months) => (
+                  <option key={months} value={months}>
+                    {t('list.months', { n: months })}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <TextArea
             label={

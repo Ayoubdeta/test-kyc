@@ -17,11 +17,18 @@ interface SendToReviewParams {
   comment: string | null;
 }
 
+interface SendToApprovalParams extends SendToReviewParams {
+  /** Validez (meses) que propone el revisor; se usará al aprobar. */
+  validityMonths: number;
+}
+
 interface DecideParams {
   status: StoredDocumentStatus; // aprobado | rechazado
   comment: string | null;
   deciderId: string;
   expiresAt: Date | null;
+  /** Validez (meses) finalmente aplicada al aprobar (null al rechazar). */
+  validityMonths: number | null;
 }
 
 export const documentRepository = {
@@ -100,16 +107,17 @@ export const documentRepository = {
    * Compliance/Admin envían el documento a Dirección tras revisarlo
    * (en_revision → pendiente_aprobacion).
    */
-  async sendToApproval(id: string, params: SendToReviewParams): Promise<DocumentRow | null> {
+  async sendToApproval(id: string, params: SendToApprovalParams): Promise<DocumentRow | null> {
     const rows = await query<DocumentRow>(
       `UPDATE documents
           SET status = 'pendiente_aprobacion',
               reviewed_by = $2,
               reviewed_at = now(),
-              review_comment = $3
+              review_comment = $3,
+              validity_months = $4
         WHERE id = $1
         RETURNING *`,
-      [id, params.reviewerId, params.comment],
+      [id, params.reviewerId, params.comment, params.validityMonths],
     );
     return rows[0] ?? null;
   },
@@ -122,7 +130,8 @@ export const documentRepository = {
               reviewed_by = $2,
               reviewed_at = now(),
               review_comment = $3,
-              expires_at = NULL
+              expires_at = NULL,
+              validity_months = NULL
         WHERE id = $1
         RETURNING *`,
       [id, params.reviewerId, params.comment],
@@ -138,10 +147,11 @@ export const documentRepository = {
               review_comment = $3,
               decided_by = $4,
               decided_at = now(),
-              expires_at = $5
+              expires_at = $5,
+              validity_months = $6
         WHERE id = $1
         RETURNING *`,
-      [id, params.status, params.comment, params.deciderId, params.expiresAt],
+      [id, params.status, params.comment, params.deciderId, params.expiresAt, params.validityMonths],
     );
     return rows[0] ?? null;
   },
