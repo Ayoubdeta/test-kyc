@@ -37,11 +37,11 @@ export function KpiCard({
             {icon}
           </span>
         )}
-        <div className="min-w-0">
-          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase leading-tight tracking-wide text-slate-500">
             {label}
           </p>
-          <p className={`text-2xl font-bold leading-tight tabular-nums ${accent}`}>{value}</p>
+          <p className={`mt-0.5 text-2xl font-bold leading-tight tabular-nums ${accent}`}>{value}</p>
         </div>
       </div>
       {hint && <p className="mt-2 text-xs text-slate-400">{hint}</p>}

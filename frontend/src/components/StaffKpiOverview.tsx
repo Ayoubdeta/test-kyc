@@ -71,7 +71,7 @@ export function StaffKpiOverview() {
         </Link>
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {kpis.map((k) => (
           <KpiCard
             key={k.label}
