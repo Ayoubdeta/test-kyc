@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useI18n } from '../i18n';
 import { Button } from './ui/Button';
 
@@ -34,7 +35,10 @@ export function PdfViewerModal({
 
   if (!open) return null;
 
-  return (
+  // Portal a document.body: así el overlay vive en el contexto de apilamiento
+  // raíz y su z-50 siempre queda por encima del header (z-30), sin que lo atrape
+  // el stacking context que crea el <main> durante su animación de entrada.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex animate-fade-in items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       role="dialog"
@@ -76,6 +80,7 @@ export function PdfViewerModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

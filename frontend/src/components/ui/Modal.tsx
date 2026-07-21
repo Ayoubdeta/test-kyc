@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   open: boolean;
@@ -65,7 +66,10 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
 
   if (!open) return null;
 
-  return (
+  // Portal a document.body: el overlay vive en el contexto de apilamiento raíz,
+  // de modo que su z-50 queda por encima del header (z-30) aunque un ancestro
+  // (p. ej. el <main> durante su animación de entrada) cree un stacking context.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex animate-fade-in items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       role="dialog"
@@ -84,6 +88,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
         </h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
