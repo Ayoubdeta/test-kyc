@@ -8,6 +8,7 @@ import type { UpdateProfileInput } from '../validators/profile.validators';
 import type {
   AdminUpdateUserInput,
   CreateClientInput,
+  CreateStaffInput,
   LanguageInput,
   ResetPasswordInput,
 } from '../validators/user.validators';
@@ -61,6 +62,21 @@ export const userController = {
       entityId: user.id,
       description: `Alta de cliente "${input.razonSocial}" (${user.email})`,
       metadata: { razonSocial: input.razonSocial, cif: input.cif, clientType: input.clientType },
+    });
+    res.status(201).json({ user, activationToken });
+  },
+
+  /** Alta de un usuario interno (compliance/dirección/admin) (solo admin). */
+  async createStaff(req: Request, res: Response): Promise<void> {
+    const input = req.body as CreateStaffInput;
+    const { user, activationToken } = await userService.createStaff(input);
+    void logService.record({
+      ...actorFromReq(req),
+      action: LOG_ACTION.STAFF_CREATED,
+      entityType: LOG_ENTITY.USER,
+      entityId: user.id,
+      description: `Alta de usuario interno "${input.fullName}" (${user.email}) con rol ${input.role}`,
+      metadata: { role: input.role },
     });
     res.status(201).json({ user, activationToken });
   },

@@ -4,6 +4,7 @@ import { adminApi } from '../api/admin.api';
 import { AdminUserEditModal } from '../components/AdminUserEditModal';
 import { RoleBadge } from '../components/Badge';
 import { CreateClientModal } from '../components/CreateClientModal';
+import { CreateStaffModal } from '../components/CreateStaffModal';
 import { QueryError } from '../components/QueryError';
 import { Button } from '../components/ui/Button';
 import { useI18n } from '../i18n';
@@ -18,6 +19,7 @@ export function AdminUsersPage() {
   const { t } = useI18n();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [creatingStaff, setCreatingStaff] = useState(false);
 
   const { data: users = [], isLoading, isError, refetch } = useQuery({
     queryKey: USERS_KEY,
@@ -31,7 +33,12 @@ export function AdminUsersPage() {
           <h1 className="text-xl font-bold text-slate-900">{t('admin.usersTitle')}</h1>
           <p className="text-sm text-slate-500">{t('admin.usersSubtitle')}</p>
         </div>
-        <Button onClick={() => setCreating(true)}>{t('admin.createClient')}</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="ghost" onClick={() => setCreatingStaff(true)}>
+            {t('admin.createStaff')}
+          </Button>
+          <Button onClick={() => setCreating(true)}>{t('admin.createClient')}</Button>
+        </div>
       </div>
 
       {isError ? (
@@ -88,6 +95,7 @@ export function AdminUsersPage() {
       )}
 
       {creating && <CreateClientModal onClose={() => setCreating(false)} />}
+      {creatingStaff && <CreateStaffModal onClose={() => setCreatingStaff(false)} />}
     </DashboardLayout>
   );
 }

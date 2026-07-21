@@ -9,6 +9,7 @@ import { updateProfileSchema } from '../validators/profile.validators';
 import {
   adminUpdateUserSchema,
   createClientSchema,
+  createStaffSchema,
   languageSchema,
   resetPasswordSchema,
 } from '../validators/user.validators';
@@ -51,6 +52,15 @@ router.post(
   jsonSmall,
   validateBody(createClientSchema),
   asyncHandler(userController.createClient),
+);
+
+// Alta de un usuario interno (compliance/dirección/admin) por enlace de activación.
+router.post(
+  '/staff',
+  requireRole(ROLES.ADMIN),
+  jsonSmall,
+  validateBody(createStaffSchema),
+  asyncHandler(userController.createStaff),
 );
 
 router.get(

@@ -11,7 +11,11 @@ import { toPublicProfile, toPublicUser } from '../utils/mappers';
 import { hashPassword } from '../utils/password';
 import { generateActivationToken, hashActivationToken } from '../utils/tokens';
 import type { UpdateProfileInput } from '../validators/profile.validators';
-import type { AdminUpdateUserInput, CreateClientInput } from '../validators/user.validators';
+import type {
+  AdminUpdateUserInput,
+  CreateClientInput,
+  CreateStaffInput,
+} from '../validators/user.validators';
 
 function normalizeBio(bio: string | undefined): string | null {
   return bio && bio.trim() !== '' ? bio : null;
@@ -100,6 +104,37 @@ export const userService = {
         razonSocial: input.razonSocial,
         cif: input.cif,
         comercialAsignado: comercial,
+      }),
+    );
+
+    return { user: toPublicUser(user), activationToken };
+  },
+
+  /**
+   * Alta de un usuario interno (compliance/dirección/admin) por parte del admin:
+   * crea la cuenta sin contraseña y devuelve el token de activación para que el
+   * admin comparta el enlace. El usuario fija su contraseña al activar.
+   */
+  async createStaff(
+    input: CreateStaffInput,
+  ): Promise<{ user: PublicUser; activationToken: string }> {
+    const emailTaken = await userRepository.findByIdentifier(input.email);
+    if (emailTaken) {
+      throw AppError.conflict('Ya existe un usuario con ese email');
+    }
+
+    const username = await generateUniqueUsername(input.email);
+    const activationToken = generateActivationToken();
+    const activationExpiresAt = new Date(Date.now() + ACTIVATION_TTL_DAYS * MS_PER_DAY);
+
+    const user = await withTransaction((client) =>
+      userRepository.createStaff(client, {
+        username,
+        email: input.email,
+        role: input.role,
+        fullName: input.fullName,
+        activationTokenHash: hashActivationToken(activationToken),
+        activationExpiresAt,
       }),
     );
 
