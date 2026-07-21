@@ -28,6 +28,15 @@ interface CreateClientParams {
   comercialAsignado: string | null;
 }
 
+interface CreateStaffParams {
+  username: string;
+  email: string;
+  role: Role;
+  fullName: string;
+  activationTokenHash: string;
+  activationExpiresAt: Date;
+}
+
 export interface UpdateProfileParams {
   fullName: string;
   phone: string;
@@ -144,14 +153,47 @@ export const userRepository = {
   },
 
   /**
-   * Busca un expediente activable por el hash del token: el token debe existir,
+   * Alta de un usuario interno (compliance/dirección/admin) por parte del admin:
+   * crea el usuario SIN contraseña con el rol indicado y su perfil (nombre). No
+   * lleva expediente (client_profiles); recibe el acceso por enlace de activación
+   * igual que el cliente. Todo en una transacción.
+   */
+  async createStaff(client: PoolClient, params: CreateStaffParams): Promise<UserRow> {
+    const userResult = await client.query<UserRow>(
+      `INSERT INTO users (username, email, role, activation_token_hash, activation_expires_at)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [
+        params.username,
+        params.email,
+        params.role,
+        params.activationTokenHash,
+        params.activationExpiresAt,
+      ],
+    );
+    const user = userResult.rows[0];
+
+    await client.query(
+      `INSERT INTO profiles (user_id, full_name) VALUES ($1, $2)`,
+      [user.id, params.fullName],
+    );
+
+    return user;
+  },
+
+  /**
+   * Busca una cuenta activable por el hash del token: el token debe existir,
    * no haber caducado y la cuenta no estar ya activada (password_hash null).
+   * Sirve tanto para clientes (nombre = razón social del expediente) como para
+   * personal interno (sin expediente → se usa el nombre del perfil o el email),
+   * de ahí los LEFT JOIN y el COALESCE.
    */
   async findActivatableByTokenHash(tokenHash: string): Promise<ActivationContext | null> {
     const rows = await query<ActivationContext>(
-      `SELECT u.id, u.email, cp.razon_social
+      `SELECT u.id, u.email, COALESCE(cp.razon_social, p.full_name, u.email) AS razon_social
          FROM users u
-         JOIN client_profiles cp ON cp.user_id = u.id
+         LEFT JOIN client_profiles cp ON cp.user_id = u.id
+         LEFT JOIN profiles p ON p.user_id = u.id
         WHERE u.activation_token_hash = $1
           AND u.activation_expires_at > now()
           AND u.password_hash IS NULL

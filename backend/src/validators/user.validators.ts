@@ -29,6 +29,18 @@ export const resetPasswordSchema = z.object({
   password: passwordField,
 });
 
+// Roles de personal interno que el admin puede dar de alta (nunca 'cliente':
+// el cliente se crea con el flujo de expediente, no aquí).
+const staffRoleField = z.enum([ROLES.ADMIN, ROLES.COMPLIANCE, ROLES.DIRECCION]);
+
+// Alta de un usuario interno (compliance/dirección/admin) por parte del admin.
+// No lleva expediente; recibe el acceso por enlace de activación como el cliente.
+export const createStaffSchema = z.object({
+  fullName: z.string().trim().min(2, 'Mínimo 2 caracteres').max(150),
+  email: emailField,
+  role: staffRoleField,
+});
+
 // Alta de un cliente por el personal interno (información mínima del expediente).
 export const createClientSchema = z.object({
   razonSocial: z.string().trim().min(2, 'Mínimo 2 caracteres').max(150),
@@ -46,4 +58,5 @@ export const languageSchema = z.object({
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type CreateClientInput = z.infer<typeof createClientSchema>;
+export type CreateStaffInput = z.infer<typeof createStaffSchema>;
 export type LanguageInput = z.infer<typeof languageSchema>;

@@ -27,10 +27,25 @@ export interface CreateClientResult {
   activationToken: string;
 }
 
+// Roles de personal interno que el admin puede dar de alta (nunca 'cliente').
+export type StaffRole = 'admin' | 'compliance' | 'direccion';
+
+export interface CreateStaffPayload {
+  fullName: string;
+  email: string;
+  role: StaffRole;
+}
+
 export const adminApi = {
   /** Alta de un cliente (devuelve el token para componer el enlace de activación). */
   async createClient(payload: CreateClientPayload): Promise<CreateClientResult> {
     const { data } = await api.post<CreateClientResult>('/users/clients', payload);
+    return data;
+  },
+
+  /** Alta de un usuario interno (devuelve el token para el enlace de activación). */
+  async createStaff(payload: CreateStaffPayload): Promise<CreateClientResult> {
+    const { data } = await api.post<CreateClientResult>('/users/staff', payload);
     return data;
   },
 

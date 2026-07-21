@@ -250,6 +250,7 @@ export type LogAction =
   | 'auth.logout'
   | 'auth.activate'
   | 'client.created'
+  | 'staff.created'
   | 'user.updated'
   | 'user.deleted'
   | 'user.password_reset'

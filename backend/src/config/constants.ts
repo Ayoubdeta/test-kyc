@@ -151,6 +151,7 @@ export const LOG_ACTION = {
   AUTH_LOGOUT: 'auth.logout',
   AUTH_ACTIVATE: 'auth.activate',
   CLIENT_CREATED: 'client.created',
+  STAFF_CREATED: 'staff.created',
   USER_UPDATED: 'user.updated',
   USER_DELETED: 'user.deleted',
   USER_PASSWORD_RESET: 'user.password_reset',
