@@ -3,12 +3,14 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { documentsApi } from '../api/documents.api';
 import { useI18n } from '../i18n';
+import { docTypeLabel } from '../i18n/labels';
 import { useCountUp } from '../hooks/useCountUp';
 import { DOCUMENT_TYPES } from '../lib/documents';
 import { displayValue, formatDate } from '../lib/format';
 import type { DocumentItem, MeResponse } from '../types';
 import { Avatar } from './Avatar';
 import { ClientDocumentsSummary } from './ClientDocumentsSummary';
+import { ExpiryCountdown } from './ExpiryCountdown';
 import {
   AlertTriangleIcon,
   CheckCircleIcon,
@@ -169,6 +171,12 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
   const rejected = count('rechazado');
   const pct = TOTAL > 0 ? approved / TOTAL : 0;
 
+  // Documento que caduca antes (aprobado o ya caducado, con fecha de caducidad).
+  // Sirve para el aviso destacado con la cuenta atrás en vivo.
+  const soonest = documents
+    .filter((d) => (d.status === 'aprobado' || d.status === 'caducado') && d.expiresAt)
+    .sort((a, b) => new Date(a.expiresAt!).getTime() - new Date(b.expiresAt!).getTime())[0];
+
   // Mensaje contextual según la situación del cliente.
   const message =
     approved === TOTAL
@@ -210,6 +218,16 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           <ProgressRing pct={pct} approved={approved} />
         </div>
       </section>
+
+      {/* ─── Aviso destacado: próxima caducidad (cuenta atrás en vivo) ─── */}
+      {soonest?.docType && (
+        <ExpiryCountdown
+          variant="card"
+          expiresAt={soonest.expiresAt}
+          label={docTypeLabel(t, soonest.docType)}
+          className="animate-fade-in-up"
+        />
+      )}
 
       {/* ─── Métricas con contador animado ─── */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

@@ -6,6 +6,7 @@ import { useI18n } from '../i18n';
 import { formatDate } from '../lib/format';
 import type { DocumentItem, DocumentTypeKey } from '../types';
 import { StatusBadge } from './Badge';
+import { ExpiryCountdown } from './ExpiryCountdown';
 import { DocTypeIcon, RefreshIcon } from './icons';
 
 const MINE_KEY = ['documents', 'mine'] as const;
@@ -193,6 +194,13 @@ export function DocumentTimeline({ docType, label, doc }: Props) {
           </div>
         ))}
       </div>
+
+      {/* Aprobado (o caducado): cuenta atrás en vivo hasta la caducidad. */}
+      {(doc?.status === 'aprobado' || doc?.status === 'caducado') && doc.expiresAt && (
+        <div className="mt-2">
+          <ExpiryCountdown expiresAt={doc.expiresAt} />
+        </div>
+      )}
 
       {/* Rechazado: motivo + botón para reenviar un documento correcto. */}
       {doc?.status === 'rechazado' && (
