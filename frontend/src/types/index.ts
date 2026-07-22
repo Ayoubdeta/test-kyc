@@ -94,6 +94,7 @@ export interface PublicProfile {
   bio: string | null;
   avatarUrl: string | null;
   language: string;
+  theme: string;
 }
 
 export interface MeResponse {

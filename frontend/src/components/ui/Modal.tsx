@@ -80,10 +80,10 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="w-full max-w-md animate-scale-in rounded-2xl bg-white p-6 shadow-elevated focus:outline-none"
+        className="w-full max-w-md animate-scale-in rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-elevated focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id={titleId} className="mb-4 text-lg font-semibold text-slate-900">
+        <h2 id={titleId} className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-50">
           {title}
         </h2>
         {children}

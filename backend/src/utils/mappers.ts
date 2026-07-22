@@ -1,13 +1,16 @@
 import {
   CHAT_SENDER,
   DEFAULT_LANGUAGE,
+  DEFAULT_THEME,
   DOCUMENT_STATUS,
   DOCUMENT_TYPES,
   SUPPORTED_LANGUAGES,
+  SUPPORTED_THEMES,
   type ChatSender,
   type DocumentStatus,
   type DocumentTypeKey,
   type Language,
+  type Theme,
 } from '../config/constants';
 import type {
   ActivityLogRow,
@@ -227,10 +230,16 @@ export function toPublicProfile(row: ProfileRow | null): PublicProfile {
     bio: row?.bio ?? null,
     avatarUrl: row?.avatar_url ?? null,
     language: toLanguage(row?.language),
+    theme: toTheme(row?.theme),
   };
 }
 
 /** Normaliza el idioma guardado a uno soportado (con fallback al por defecto). */
 function toLanguage(value: string | null | undefined): Language {
   return SUPPORTED_LANGUAGES.includes(value as Language) ? (value as Language) : DEFAULT_LANGUAGE;
+}
+
+/** Normaliza el tema guardado a uno soportado (con fallback al por defecto). */
+function toTheme(value: string | null | undefined): Theme {
+  return SUPPORTED_THEMES.includes(value as Theme) ? (value as Theme) : DEFAULT_THEME;
 }

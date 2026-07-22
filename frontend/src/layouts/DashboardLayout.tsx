@@ -101,8 +101,8 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t border-slate-200 bg-white/60">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 text-xs text-slate-400">
+      <footer className="border-t border-slate-200 dark:border-slate-700 bg-white/60">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 text-xs text-slate-400 dark:text-slate-500">
           <span>© {new Date().getFullYear()} KYC</span>
           <PoweredByDecal />
         </div>

@@ -13,15 +13,15 @@ function QuickLink({ to, title, description }: { to: string; title: string; desc
   return (
     <Link
       to={to}
-      className="group animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-elevated"
+      className="group animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-card transition duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-elevated"
     >
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-slate-800">{title}</h3>
+        <h3 className="font-semibold text-slate-800 dark:text-slate-100">{title}</h3>
         <span className="text-brand-500 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true">
           →
         </span>
       </div>
-      <p className="mt-1 text-sm text-slate-500">{description}</p>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
     </Link>
   );
 }
@@ -29,17 +29,17 @@ function QuickLink({ to, title, description }: { to: string; title: string; desc
 // Fila de dato clave/valor reutilizable.
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5 border-b border-slate-100 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between">
-      <dt className="text-sm font-medium text-slate-500">{label}</dt>
-      <dd className="text-sm text-slate-900 sm:text-end">{value}</dd>
+    <div className="flex flex-col gap-0.5 border-b border-slate-100 dark:border-slate-800 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+      <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="text-sm text-slate-900 dark:text-slate-50 sm:text-end">{value}</dd>
     </div>
   );
 }
 
 function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
-      <h2 className="mb-2 text-base font-semibold text-slate-800">{title}</h2>
+    <section className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-card">
+      <h2 className="mb-2 text-base font-semibold text-slate-800 dark:text-slate-100">{title}</h2>
       <dl>{children}</dl>
     </section>
   );
@@ -73,15 +73,15 @@ export function DashboardPage() {
         <div className="flex items-center gap-4">
           <Avatar src={profile.avatarUrl} name={displayName} size="md" />
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
               {t('staffDash.hello', { name: displayValue(profile.fullName ?? user.username) })}
             </h1>
-            <p className="text-sm text-slate-500">{t('staffDash.subtitle')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('staffDash.subtitle')}</p>
           </div>
         </div>
         <Link
           to="/settings"
-          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-slate-800"
         >
           {t('nav.settings')}
         </Link>
@@ -150,7 +150,7 @@ export function DashboardPage() {
       {profile.bio && (
         <div className="mt-5">
           <InfoCard title={t('staffDash.bioTitle')}>
-            <p className="py-1 text-sm leading-relaxed text-slate-700">{profile.bio}</p>
+            <p className="py-1 text-sm leading-relaxed text-slate-700 dark:text-slate-200">{profile.bio}</p>
           </InfoCard>
         </div>
       )}

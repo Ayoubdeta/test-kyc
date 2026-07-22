@@ -18,10 +18,10 @@ export function QueryError({ onRetry, message }: QueryErrorProps) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-8 text-center"
+      className="flex flex-col items-center gap-3 rounded-2xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-8 text-center"
     >
       <AlertTriangleIcon className="h-8 w-8 text-red-500" />
-      <p className="text-sm font-medium text-red-700">{message ?? t('common.loadError')}</p>
+      <p className="text-sm font-medium text-red-700 dark:text-red-400">{message ?? t('common.loadError')}</p>
       {onRetry && (
         <Button variant="ghost" onClick={onRetry}>
           <RefreshIcon className="h-4 w-4" />

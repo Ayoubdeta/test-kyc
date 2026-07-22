@@ -158,14 +158,14 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="my-8 w-full max-w-lg animate-scale-in rounded-2xl bg-white p-6 shadow-elevated"
+        className="my-8 w-full max-w-lg animate-scale-in rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-elevated"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">{t('eu.title')}</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">{t('eu.title')}</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600"
+            className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             aria-label={t('eu.close')}
           >
             ✕
@@ -173,7 +173,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
         </div>
 
         {/* Pestañas: cuenta / documentos / historial */}
-        <div className="mb-5 flex gap-1 border-b border-slate-200">
+        <div className="mb-5 flex gap-1 border-b border-slate-200 dark:border-slate-700">
           {([
             ['cuenta', t('eu.tabAccount')],
             ['documentos', t('eu.tabDocuments')],
@@ -185,8 +185,8 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
               onClick={() => setTab(key)}
               className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                 tab === key
-                  ? 'border-brand-600 text-brand-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
+                  ? 'border-brand-600 text-brand-700 dark:text-brand-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {label}
@@ -199,7 +199,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
 
         {tab === 'cuenta' &&
           (isLoading ? (
-            <p className="py-8 text-center text-sm text-slate-500">{t('common.loading')}</p>
+            <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
           ) : (
             <div className="flex flex-col gap-6">
             {error && <Alert>{error}</Alert>}
@@ -216,12 +216,12 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                   error={fieldErrors.username}
                 />
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="role" className="text-sm font-medium text-slate-700">
+                  <label htmlFor="role" className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     {t('eu.role')}
                   </label>
                   <select
                     id="role"
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
+                    className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
                     value={values.role}
                     disabled={isSelf}
                     onChange={handleChange('role')}
@@ -233,7 +233,7 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
                     ))}
                   </select>
                   {isSelf && (
-                    <span className="text-xs text-slate-400">{t('eu.cantChangeOwnRole')}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">{t('eu.cantChangeOwnRole')}</span>
                   )}
                 </div>
               </div>
@@ -292,8 +292,8 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
             </form>
 
             {/* Restablecer contraseña */}
-            <div className="border-t border-slate-200 pt-5">
-              <h3 className="mb-2 text-sm font-semibold text-slate-800">{t('eu.resetPwTitle')}</h3>
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
+              <h3 className="mb-2 text-sm font-semibold text-slate-800 dark:text-slate-100">{t('eu.resetPwTitle')}</h3>
               <div className="flex items-end gap-3">
                 <div className="flex-1">
                   <TextField
@@ -318,11 +318,11 @@ export function AdminUserEditModal({ userId, isSelf, onClose }: Props) {
 
             {/* Eliminar usuario */}
             {!isSelf && (
-              <div className="border-t border-slate-200 pt-5">
-                <h3 className="mb-2 text-sm font-semibold text-red-700">{t('eu.dangerZone')}</h3>
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
+                <h3 className="mb-2 text-sm font-semibold text-red-700 dark:text-red-400">{t('eu.dangerZone')}</h3>
                 {confirmingDelete ? (
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-600">{t('eu.confirmDelete')}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">{t('eu.confirmDelete')}</span>
                     <Button
                       variant="danger"
                       onClick={() => deleteMutation.mutate()}

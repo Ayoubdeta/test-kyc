@@ -76,7 +76,7 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-5 end-5 z-40">
       {open && (
-        <div className="mb-3 flex h-[30rem] w-[23rem] max-w-[calc(100vw-2.5rem)] animate-scale-in flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-elevated">
+        <div className="mb-3 flex h-[30rem] w-[23rem] max-w-[calc(100vw-2.5rem)] animate-scale-in flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-elevated">
           <div className="flex items-center justify-between bg-gradient-to-r from-brand-700 to-brand-600 px-4 py-3 text-white">
             <div>
               <p className="text-sm font-semibold">{t('chat.widgetTitle')}</p>
@@ -126,7 +126,7 @@ export function ChatWidget() {
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         {unread > 0 && !open && (
-          <span className="absolute -end-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white px-1 text-[11px] font-bold text-brand-700 ring-2 ring-brand-600">
+          <span className="absolute -end-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-white dark:bg-slate-900 px-1 text-[11px] font-bold text-brand-700 dark:text-brand-400 ring-2 ring-brand-600">
             {unread > 9 ? '9+' : unread}
           </span>
         )}

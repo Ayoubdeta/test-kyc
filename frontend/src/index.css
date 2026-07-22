@@ -14,12 +14,19 @@ html {
 }
 
 body {
-  @apply text-slate-900 antialiased;
+  @apply text-slate-900 antialiased dark:text-slate-100;
   /* Fondo blanco empresarial con un tinte rojo muy sutil. */
   background: radial-gradient(1200px 600px at 100% -10%, #fef2f3 0%, transparent 55%),
     radial-gradient(1000px 500px at -10% 110%, #fafafa 0%, transparent 50%), #f8f7f8;
   background-attachment: fixed;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Fondo oscuro equivalente: mismos degradados pero sobre un slate profundo. */
+html.dark body {
+  background: radial-gradient(1200px 600px at 100% -10%, rgba(215, 0, 27, 0.12) 0%, transparent 55%),
+    radial-gradient(1000px 500px at -10% 110%, rgba(148, 163, 184, 0.06) 0%, transparent 50%),
+    #0b1120;
 }
 
 /* Respeto por quien prefiere menos movimiento (accesibilidad): desactiva

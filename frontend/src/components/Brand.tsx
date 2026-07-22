@@ -15,7 +15,7 @@ export function DecalLogo({ className = 'h-5' }: { className?: string }) {
 /** Sello "by Decal": el logo de la empresa con una etiqueta discreta. */
 export function PoweredByDecal({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs text-slate-400 ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 ${className}`}>
       <span>by</span>
       <DecalLogo className="h-4 w-auto" />
     </span>

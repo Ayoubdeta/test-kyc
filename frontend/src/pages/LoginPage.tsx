@@ -59,7 +59,7 @@ export function LoginPage() {
     <AuthLayout
       title={t('login.title')}
       subtitle={t('login.subtitle')}
-      footer={<span className="text-slate-500">{t('login.footer')}</span>}
+      footer={<span className="text-slate-500 dark:text-slate-400">{t('login.footer')}</span>}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         {formError && <Alert>{formError}</Alert>}

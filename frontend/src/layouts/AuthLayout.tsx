@@ -3,6 +3,7 @@ import { AuthBackground } from '../components/AuthBackground';
 import { AuthCarousel } from '../components/AuthCarousel';
 import { AppLogo, PoweredByDecal } from '../components/Brand';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { ThemeSwitcher } from '../components/ThemeSwitcher';
 
 interface AuthLayoutProps {
   title: string;
@@ -24,7 +25,7 @@ export function AuthLayout({ title, subtitle, children, footer, size = 'md' }: A
       <AuthBackground />
 
       <div
-        className={`relative grid w-full ${maxWidth} animate-fade-in-up overflow-hidden rounded-3xl bg-white shadow-elevated md:grid-cols-2`}
+        className={`relative grid w-full ${maxWidth} animate-fade-in-up overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-elevated md:grid-cols-2`}
       >
         {/* Panel de marca (oculto en móvil) */}
         <aside className="relative hidden flex-col justify-between bg-gradient-to-br from-brand-700 via-brand-600 to-brand-800 p-10 text-white md:flex">
@@ -57,27 +58,28 @@ export function AuthLayout({ title, subtitle, children, footer, size = 'md' }: A
 
         {/* Panel del formulario */}
         <div className="flex flex-col justify-center p-8 sm:p-10">
-          {/* Selector de idioma (disponible sin sesión) */}
-          <div className="mb-4 flex justify-end">
+          {/* Selectores de idioma y tema (disponibles sin sesión) */}
+          <div className="mb-4 flex flex-wrap justify-end gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher />
           </div>
 
           {/* Marca en móvil (cuando el panel lateral está oculto) */}
           <div className="mb-6 flex items-center gap-2.5 md:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-500/10">
               <AppLogo className="h-7 w-7" />
             </div>
-            <span className="text-lg font-semibold text-slate-800">KYC</span>
+            <span className="text-lg font-semibold text-slate-800 dark:text-slate-100">KYC</span>
           </div>
 
           <div className="mb-6">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
-            <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">{title}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
           </div>
 
           {children}
 
-          <div className="mt-6 text-center text-sm text-slate-600">{footer}</div>
+          <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-300">{footer}</div>
 
           <div className="mt-6 flex justify-center md:hidden">
             <PoweredByDecal />

@@ -44,9 +44,9 @@ export function ExpiryCountdown({ expiresAt, variant = 'inline', label, classNam
 
   if (variant === 'card') {
     const cardTone: Record<Tone, string> = {
-      ok: 'border-brand-200 bg-brand-50 text-brand-700',
-      warn: 'border-amber-200 bg-amber-50 text-amber-700',
-      expired: 'border-red-200 bg-red-50 text-red-700',
+      ok: 'border-brand-200 dark:border-brand-500/30 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400',
+      warn: 'border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
+      expired: 'border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400',
     };
     return (
       <div
@@ -70,9 +70,9 @@ export function ExpiryCountdown({ expiresAt, variant = 'inline', label, classNam
 
   // Variante inline (dentro de la línea de tiempo del documento).
   const inlineTone: Record<Tone, string> = {
-    ok: 'bg-brand-50 text-brand-700',
-    warn: 'bg-amber-50 text-amber-700',
-    expired: 'bg-red-50 text-red-700',
+    ok: 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400',
+    warn: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
+    expired: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400',
   };
   return (
     <span

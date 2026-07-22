@@ -40,14 +40,14 @@ export function CookieConsent() {
       aria-live="polite"
       aria-label={t('cookie.title')}
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-elevated sm:flex-row sm:items-center sm:gap-4">
-        <p className="flex-1 text-sm text-slate-600">
+      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-elevated sm:flex-row sm:items-center sm:gap-4">
+        <p className="flex-1 text-sm text-slate-600 dark:text-slate-300">
           {t('cookie.message')}{' '}
           <a
             href="https://decalesp.com/cookies/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-600 underline hover:text-brand-700"
+            className="font-medium text-brand-600 dark:text-brand-400 underline hover:text-brand-700 dark:hover:text-brand-400"
           >
             {t('cookie.learnMore')}
           </a>

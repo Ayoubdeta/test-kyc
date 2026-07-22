@@ -28,19 +28,19 @@ export function ClientDocumentsSummary() {
   ).length;
 
   return (
-    <section className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+    <section className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-card">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-slate-800">{t('summary.title')}</h2>
-          <p className="text-sm text-slate-500">{t('summary.subtitle')}</p>
+          <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">{t('summary.title')}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('summary.subtitle')}</p>
         </div>
-        <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+        <span className="shrink-0 rounded-full bg-brand-50 dark:bg-brand-500/10 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-400">
           {t('dashboard.approvedOf', { approved: approvedCount, total: DOCUMENT_TYPES.length })}
         </span>
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-3">
           {DOCUMENT_TYPES.map((type) => (
@@ -56,7 +56,7 @@ export function ClientDocumentsSummary() {
 
       <Link
         to="/documents"
-        className="mt-4 inline-flex text-sm font-medium text-brand-600 transition hover:text-brand-700"
+        className="mt-4 inline-flex text-sm font-medium text-brand-600 dark:text-brand-400 transition hover:text-brand-700 dark:hover:text-brand-400"
       >
         {t('summary.manage')}
       </Link>

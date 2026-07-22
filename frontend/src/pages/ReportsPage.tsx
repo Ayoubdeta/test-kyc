@@ -61,8 +61,8 @@ export function ReportsPage() {
     <DashboardLayout>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">{t('rep.title')}</h1>
-          <p className="text-sm text-slate-500">{t('rep.subtitle')}</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('rep.title')}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('rep.subtitle')}</p>
         </div>
         <Button
           variant="ghost"
@@ -75,28 +75,28 @@ export function ReportsPage() {
       </div>
 
       {/* Barra de filtros modular */}
-      <div className="mb-6 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+      <div className="mb-6 animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">{t('kpi.from')}</span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{t('kpi.from')}</span>
             <input
               type="date"
               value={draft.from ?? ''}
               onChange={(e) => setDraft((d) => ({ ...d, from: e.target.value || undefined }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">{t('kpi.to')}</span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{t('kpi.to')}</span>
             <input
               type="date"
               value={draft.to ?? ''}
               onChange={(e) => setDraft((d) => ({ ...d, to: e.target.value || undefined }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">{t('kpi.type')}</span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{t('kpi.type')}</span>
             <select
               value={draft.docType ?? ''}
               onChange={(e) =>
@@ -105,7 +105,7 @@ export function ReportsPage() {
                   docType: (e.target.value || undefined) as DocumentTypeKey | undefined,
                 }))
               }
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">{t('kpi.all')}</option>
               {DOCUMENT_TYPES.map((dt) => (
@@ -116,7 +116,7 @@ export function ReportsPage() {
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">{t('kpi.statusLabel')}</span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{t('kpi.statusLabel')}</span>
             <select
               value={draft.status ?? ''}
               onChange={(e) =>
@@ -125,7 +125,7 @@ export function ReportsPage() {
                   status: (e.target.value || undefined) as DocumentStatus | undefined,
                 }))
               }
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">{t('kpi.all')}</option>
               {STATUS_ORDER.map((s) => (
@@ -136,16 +136,16 @@ export function ReportsPage() {
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-slate-700">{t('rep.client')}</span>
+            <span className="font-medium text-slate-700 dark:text-slate-200">{t('rep.client')}</span>
             <div className="relative">
-              <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <SearchIcon className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder={t('rep.searchPlaceholder')}
                 value={draft.search ?? ''}
                 onChange={(e) => setDraft((d) => ({ ...d, search: e.target.value || undefined }))}
                 onKeyDown={(e) => e.key === 'Enter' && apply()}
-                className="w-full rounded-lg border border-slate-300 py-2 ps-8 pe-3 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 py-2 ps-8 pe-3 text-sm outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </label>
@@ -165,41 +165,41 @@ export function ReportsPage() {
       {isError ? (
         <QueryError onRetry={() => refetch()} />
       ) : isLoading || !data ? (
-        <p className="text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
       ) : (
         <div className="flex flex-col gap-4">
           {/* Resumen */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.total')}</p>
-              <p className="mt-1 text-2xl font-bold text-slate-800">{data.total}</p>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card">
+              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('rep.total')}</p>
+              <p className="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">{data.total}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.approved')}</p>
-              <p className="mt-1 text-2xl font-bold text-green-600">{data.summary.aprobados}</p>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card">
+              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('rep.approved')}</p>
+              <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">{data.summary.aprobados}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-              <p className="text-xs uppercase tracking-wide text-slate-500">{t('rep.cancelledRejected')}</p>
-              <p className="mt-1 text-2xl font-bold text-red-600">{data.summary.rechazados}</p>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card">
+              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{t('rep.cancelledRejected')}</p>
+              <p className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">{data.summary.rechazados}</p>
             </div>
           </div>
 
           {data.truncated && (
-            <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
+            <p className="rounded-lg bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
               {t('rep.truncated', { limit: data.limit })}
             </p>
           )}
 
           {/* Tabla de detalle */}
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-card">
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-card">
             {data.rows.length === 0 ? (
               <div className="flex flex-col items-center gap-2 p-10 text-center">
                 <InboxIcon className="h-8 w-8 text-slate-300" />
-                <p className="text-sm text-slate-500">{t('rep.empty')}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('rep.empty')}</p>
               </div>
             ) : (
               <table className="w-full min-w-[900px] text-start text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   <tr>
                     <th className="px-4 py-3">{t('rep.thClient')}</th>
                     <th className="px-4 py-3">{t('rep.thDocument')}</th>
@@ -209,14 +209,14 @@ export function ReportsPage() {
                     <th className="px-4 py-3">{t('rep.thReason')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {data.rows.map((r) => (
-                    <tr key={r.documentId} className="align-top hover:bg-slate-50">
+                    <tr key={r.documentId} className="align-top hover:bg-slate-50 dark:hover:bg-slate-800">
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-800">{r.clientName}</div>
-                        <div className="text-xs text-slate-500">{r.clientEmail}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-100">{r.clientName}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">{r.clientEmail}</div>
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{r.docLabel}</td>
+                      <td className="px-4 py-3 text-slate-700 dark:text-slate-200">{r.docLabel}</td>
                       <td className="px-4 py-3">
                         <span
                           className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASSES[r.status]}`}
@@ -224,21 +224,21 @@ export function ReportsPage() {
                           {statusLabel(t, r.status)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{formatDate(r.uploadedAt)}</td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{formatDate(r.uploadedAt)}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {r.decidedAt ? (
                           <>
                             <div>{formatDate(r.decidedAt)}</div>
                             {r.deciderName && (
-                              <div className="text-xs text-slate-400">{r.deciderName}</div>
+                              <div className="text-xs text-slate-400 dark:text-slate-500">{r.deciderName}</div>
                             )}
                           </>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {r.comment ? r.comment : <span className="text-slate-400">—</span>}
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        {r.comment ? r.comment : <span className="text-slate-400 dark:text-slate-500">—</span>}
                       </td>
                     </tr>
                   ))}

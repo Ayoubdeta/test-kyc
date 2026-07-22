@@ -41,8 +41,8 @@ export function HistoryPage() {
   return (
     <DashboardLayout>
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-slate-900">{t('history.title')}</h1>
-        <p className="text-sm text-slate-500">{t('history.subtitle')}</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('history.title')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('history.subtitle')}</p>
       </div>
 
       {/* Filtros por estado */}
@@ -57,7 +57,7 @@ export function HistoryPage() {
               className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
                 isActive
                   ? 'bg-brand-600 text-white shadow-sm'
-                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
               {f.label}
@@ -69,16 +69,16 @@ export function HistoryPage() {
       {isError ? (
         <QueryError onRetry={() => refetch()} />
       ) : isLoading ? (
-        <p className="text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
       ) : filtered.length === 0 ? (
-        <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
+        <div className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-10 text-center shadow-card">
           <FolderIcon className="mx-auto h-9 w-9 text-slate-300" />
-          <p className="mt-3 text-sm text-slate-500">
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
             {active ? t('history.emptyFiltered') : t('history.empty')}
           </p>
         </div>
       ) : (
-        <ol className="relative flex flex-col gap-4 border-s border-slate-200 ps-6">
+        <ol className="relative flex flex-col gap-4 border-s border-slate-200 dark:border-slate-700 ps-6">
           {filtered.map((ev) => {
             const meta = EVENT_META[ev.eventType];
             return (
@@ -88,33 +88,33 @@ export function HistoryPage() {
                   className={`absolute -start-[1.9rem] top-1.5 h-3 w-3 rounded-full ring-4 ring-white ${meta.dot}`}
                   aria-hidden="true"
                 />
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <EventIcon type={ev.eventType} className="h-4 w-4 text-slate-500" />
-                      <span className="text-sm font-semibold text-slate-800">
+                      <EventIcon type={ev.eventType} className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                         {eventLabel(t, ev.eventType)}
                       </span>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
                         · {docTypeLabel(t, ev.docType)}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400">{formatDateTime(ev.createdAt)}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">{formatDateTime(ev.createdAt)}</span>
                   </div>
 
                   {/* Detalle según el tipo de evento */}
                   {ev.eventType === 'aprobado' && ev.expiresAt && (
-                    <p className="mt-1.5 text-xs text-green-700">
+                    <p className="mt-1.5 text-xs text-green-700 dark:text-green-400">
                       {t('docs.validUntil', { date: formatDate(ev.expiresAt) })}
                     </p>
                   )}
                   {ev.eventType === 'rechazado' && (
-                    <p className="mt-1.5 text-xs text-red-600">
+                    <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
                       {ev.comment ? `${t('common.reason')}: ${ev.comment}` : t('history.noReason')}
                     </p>
                   )}
                   {ev.originalName && (
-                    <p className="mt-1 text-xs text-slate-400">{ev.originalName}</p>
+                    <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{ev.originalName}</p>
                   )}
                 </div>
               </li>

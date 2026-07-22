@@ -77,9 +77,9 @@ export function ActivatePage() {
   };
 
   const loginFooter = (
-    <span className="text-slate-500">
+    <span className="text-slate-500 dark:text-slate-400">
       {t('activate.footer')}
-      <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-700">
+      <Link to="/login" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-400">
         {t('activate.footerLink')}
       </Link>
     </span>
@@ -112,9 +112,9 @@ export function ActivatePage() {
         {formError && <Alert>{formError}</Alert>}
 
         {info.data && (
-          <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
+          <p className="rounded-lg bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-600 dark:text-slate-300">
             {t('activate.account')}{' '}
-            <span className="font-medium text-slate-800">{info.data.email}</span>
+            <span className="font-medium text-slate-800 dark:text-slate-100">{info.data.email}</span>
           </p>
         )}
 
@@ -137,25 +137,25 @@ export function ActivatePage() {
           error={fieldErrors.confirmPassword}
         />
 
-        <label className="flex items-start gap-2.5 text-sm text-slate-600">
+        <label className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
           <input
             type="checkbox"
             checked={acceptPrivacy}
             onChange={(e) => setAcceptPrivacy(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500"
           />
           <span>{t('activate.acceptPrivacy')}</span>
         </label>
-        <label className="flex items-start gap-2.5 text-sm text-slate-600">
+        <label className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
           <input
             type="checkbox"
             checked={acceptTerms}
             onChange={(e) => setAcceptTerms(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500"
           />
           <span>{t('activate.acceptTerms')}</span>
         </label>
-        {fieldErrors.accept && <p className="-mt-2 text-sm text-red-600">{fieldErrors.accept}</p>}
+        {fieldErrors.accept && <p className="-mt-2 text-sm text-red-600 dark:text-red-400">{fieldErrors.accept}</p>}
 
         <Button type="submit" isLoading={submitting} className="mt-2 w-full">
           {t('activate.submit')}

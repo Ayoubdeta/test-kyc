@@ -99,7 +99,7 @@ const DOT_CLASSES: Record<NodeTone, string> = {
   ok: 'bg-green-500 text-white',
   warn: 'bg-amber-500 text-white',
   error: 'bg-red-500 text-white',
-  pending: 'border border-slate-300 bg-white text-transparent',
+  pending: 'border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-transparent',
 };
 
 const DOT_ICON: Record<NodeTone, string> = {
@@ -154,16 +154,16 @@ export function DocumentTimeline({ docType, label, doc }: Props) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
-          <DocTypeIcon docType={docType} className="h-5 w-5 shrink-0 text-slate-400" />
-          <span className="truncate text-sm font-medium text-slate-800">{label}</span>
+          <DocTypeIcon docType={docType} className="h-5 w-5 shrink-0 text-slate-400 dark:text-slate-500" />
+          <span className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{label}</span>
         </div>
         {doc ? (
           <StatusBadge status={doc.status} />
         ) : (
-          <span className="inline-flex shrink-0 items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500">
+          <span className="inline-flex shrink-0 items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
             {t('common.notUploaded')}
           </span>
         )}
@@ -176,17 +176,17 @@ export function DocumentTimeline({ docType, label, doc }: Props) {
             {i > 0 && (
               <div
                 className={`mt-3.5 h-0.5 flex-1 ${
-                  PASSED.includes(steps[i - 1].tone) ? 'bg-brand-300' : 'bg-slate-200'
+                  PASSED.includes(steps[i - 1].tone) ? 'bg-brand-300' : 'bg-slate-200 dark:bg-slate-700'
                 }`}
               />
             )}
             <div className="flex w-16 shrink-0 flex-col items-center text-center">
               <StepDot tone={step.tone} />
-              <span className="mt-1.5 text-[10px] font-medium leading-tight text-slate-600">
+              <span className="mt-1.5 text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
                 {t(step.labelKey)}
               </span>
               {step.date && (
-                <span className="mt-0.5 text-[9px] leading-tight text-slate-400">
+                <span className="mt-0.5 text-[9px] leading-tight text-slate-400 dark:text-slate-500">
                   {formatDate(step.date)}
                 </span>
               )}
@@ -206,7 +206,7 @@ export function DocumentTimeline({ docType, label, doc }: Props) {
       {doc?.status === 'rechazado' && (
         <div className="mt-2 flex flex-col gap-2">
           {doc.reviewComment && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-400">
               {t('common.reason')}: {doc.reviewComment}
             </p>
           )}
@@ -226,7 +226,7 @@ export function DocumentTimeline({ docType, label, doc }: Props) {
             className="hidden"
             onChange={onFileChange}
           />
-          {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
+          {uploadError && <p className="text-xs text-red-600 dark:text-red-400">{uploadError}</p>}
         </div>
       )}
     </div>

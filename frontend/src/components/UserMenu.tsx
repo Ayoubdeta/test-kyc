@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Avatar } from './Avatar';
 import { RoleBadge } from './Badge';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { LogOutIcon, SettingsIcon } from './icons';
 
 // Menú de usuario en la cabecera: al pulsar el avatar o el nombre se despliega
@@ -85,25 +86,31 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute end-0 z-40 mt-2 w-72 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
+        <div className="absolute end-0 z-40 mt-2 w-72 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-elevated">
           {/* Cabecera con la identidad del usuario */}
-          <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-4">
+          <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-4 py-4">
             <Avatar src={profile.avatarUrl} name={displayName} size="sm" />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-800">{displayName}</p>
-              <p className="truncate text-xs text-slate-500">{user.email}</p>
+              <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</p>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
-            <span className="text-xs text-slate-500">{t('common.role')}</span>
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-2.5">
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t('common.role')}</span>
             <RoleBadge role={user.role} />
           </div>
 
           {/* Selección de idioma */}
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-2.5">
-            <span className="text-xs text-slate-500">{t('switcher.label')}</span>
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 px-4 py-2.5">
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t('switcher.label')}</span>
             <LanguageSwitcher />
+          </div>
+
+          {/* Selección de tema */}
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 px-4 py-2.5">
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t('theme.label')}</span>
+            <ThemeSwitcher />
           </div>
 
           {/* Acciones */}
@@ -111,16 +118,16 @@ export function UserMenu() {
             <Link
               to="/settings"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <SettingsIcon className="h-4 w-4 text-slate-500" />
+              <SettingsIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               {t('userMenu.editProfile')}
             </Link>
             <button
               type="button"
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50"
             >
               <LogOutIcon className="h-4 w-4" />
               {loggingOut ? t('userMenu.loggingOut') : t('userMenu.logout')}
@@ -128,7 +135,7 @@ export function UserMenu() {
           </div>
 
           {error && (
-            <p className="border-t border-slate-100 px-4 py-2 text-xs text-red-600" role="alert">
+            <p className="border-t border-slate-100 dark:border-slate-800 px-4 py-2 text-xs text-red-600 dark:text-red-400" role="alert">
               {error}
             </p>
           )}

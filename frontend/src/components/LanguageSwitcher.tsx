@@ -30,11 +30,11 @@ export function LanguageSwitcher({ className }: { className?: string }) {
 
   return (
     <label
-      className={`inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 ${
+      className={`inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-sm text-slate-700 dark:text-slate-200 focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 ${
         className ?? ''
       }`}
     >
-      <GlobeIcon className="h-4 w-4 shrink-0 text-slate-400" />
+      <GlobeIcon className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
       <span className="sr-only">{t('switcher.label')}</span>
       <select
         value={lang}

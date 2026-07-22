@@ -12,6 +12,7 @@ import {
   createStaffSchema,
   languageSchema,
   resetPasswordSchema,
+  themeSchema,
 } from '../validators/user.validators';
 
 const router = Router();
@@ -38,6 +39,14 @@ router.patch(
   express.json({ limit: '1kb' }),
   validateBody(languageSchema),
   asyncHandler(userController.setLanguage),
+);
+
+// Preferencia de tema (claro / oscuro / automático). Cuerpo pequeño.
+router.patch(
+  '/me/theme',
+  express.json({ limit: '1kb' }),
+  validateBody(themeSchema),
+  asyncHandler(userController.setTheme),
 );
 
 // ─── Administración de usuarios (solo admin) ───────────────────

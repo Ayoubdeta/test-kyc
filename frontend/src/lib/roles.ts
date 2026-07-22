@@ -12,9 +12,9 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 export const ROLE_BADGE_CLASSES: Record<Role, string> = {
   admin: 'bg-purple-100 text-purple-700',
-  cliente: 'bg-brand-100 text-brand-700',
-  compliance: 'bg-amber-100 text-amber-700',
-  direccion: 'bg-indigo-100 text-indigo-700',
+  cliente: 'bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400',
+  compliance: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
+  direccion: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400',
 };
 
 export const STATUS_LABELS: Record<DocumentStatus, string> = {
@@ -27,12 +27,12 @@ export const STATUS_LABELS: Record<DocumentStatus, string> = {
 };
 
 export const STATUS_BADGE_CLASSES: Record<DocumentStatus, string> = {
-  pendiente: 'bg-slate-100 text-slate-600',
-  en_revision: 'bg-blue-100 text-blue-700',
-  pendiente_aprobacion: 'bg-indigo-100 text-indigo-700',
-  aprobado: 'bg-green-100 text-green-700',
-  rechazado: 'bg-red-100 text-red-700',
-  caducado: 'bg-amber-100 text-amber-700',
+  pendiente: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
+  en_revision: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',
+  pendiente_aprobacion: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400',
+  aprobado: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+  rechazado: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
+  caducado: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
 };
 
 // Color (hex) por estado, para gráficas SVG (no admiten clases de Tailwind).

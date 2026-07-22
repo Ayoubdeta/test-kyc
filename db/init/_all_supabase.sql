@@ -509,3 +509,14 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_sender_id ON chat_messages(sender_i
 CREATE INDEX IF NOT EXISTS idx_chat_messages_reply_to_id ON chat_messages(reply_to_id);
 CREATE INDEX IF NOT EXISTS idx_client_profiles_expediente_status
     ON client_profiles(expediente_status);
+
+-- ════════════════════════════════════════════════════════════════
+--  14 · Preferencia de tema por usuario (claro / oscuro / automático)
+-- ════════════════════════════════════════════════════════════════
+
+ALTER TABLE profiles
+    ADD COLUMN IF NOT EXISTS theme VARCHAR(10) NOT NULL DEFAULT 'system';
+
+ALTER TABLE profiles DROP CONSTRAINT IF EXISTS chk_profiles_theme;
+ALTER TABLE profiles ADD CONSTRAINT chk_profiles_theme
+    CHECK (theme IN ('light', 'dark', 'system'));

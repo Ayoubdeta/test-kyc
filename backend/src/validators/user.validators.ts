@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CLIENT_TYPE, ROLES, SUPPORTED_LANGUAGES } from '../config/constants';
+import { CLIENT_TYPE, ROLES, SUPPORTED_LANGUAGES, SUPPORTED_THEMES } from '../config/constants';
 import { emailField, passwordField, usernameField } from './auth.validators';
 import {
   addressField,
@@ -55,8 +55,14 @@ export const languageSchema = z.object({
   language: z.enum(SUPPORTED_LANGUAGES),
 });
 
+// Preferencia de tema del usuario autenticado (claro / oscuro / automático).
+export const themeSchema = z.object({
+  theme: z.enum(SUPPORTED_THEMES),
+});
+
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type CreateClientInput = z.infer<typeof createClientSchema>;
 export type CreateStaffInput = z.infer<typeof createStaffSchema>;
 export type LanguageInput = z.infer<typeof languageSchema>;
+export type ThemeInput = z.infer<typeof themeSchema>;

@@ -88,14 +88,14 @@ export function ChatPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">{t('chat.pageTitle')}</h1>
-        <p className="text-sm text-slate-500">{t('chat.pageSubtitle')}</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('chat.pageTitle')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('chat.pageSubtitle')}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
         {/* Lista de conversaciones */}
-        <div className="animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
-          <div className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+        <div className="animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-card">
+          <div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
             {t('chat.conversations')}
           </div>
           {isError ? (
@@ -103,24 +103,24 @@ export function ChatPage() {
               <QueryError onRetry={() => refetch()} />
             </div>
           ) : isLoading ? (
-            <p className="p-4 text-sm text-slate-500">{t('common.loading')}</p>
+            <p className="p-4 text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
           ) : conversations.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">{t('chat.noConversations')}</p>
+            <p className="p-4 text-sm text-slate-500 dark:text-slate-400">{t('chat.noConversations')}</p>
           ) : (
-            <ul className="max-h-[28rem] divide-y divide-slate-100 overflow-y-auto">
+            <ul className="max-h-[28rem] divide-y divide-slate-100 dark:divide-slate-800 overflow-y-auto">
               {conversations.map((c) => (
                 <li key={c.clientId}>
                   <button
                     type="button"
                     onClick={() => openConversation(c.clientId)}
-                    className={`flex w-full items-start gap-2 px-4 py-3 text-start transition hover:bg-slate-50 ${
-                      selected === c.clientId ? 'bg-brand-50' : ''
+                    className={`flex w-full items-start gap-2 px-4 py-3 text-start transition hover:bg-slate-50 dark:hover:bg-slate-800 ${
+                      selected === c.clientId ? 'bg-brand-50 dark:bg-brand-500/10' : ''
                     }`}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-800">{c.name}</p>
-                      <p className="truncate text-xs text-slate-500">{c.lastMessage}</p>
-                      <p className="mt-0.5 text-[10px] text-slate-400">{formatDateTime(c.lastAt)}</p>
+                      <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{c.name}</p>
+                      <p className="truncate text-xs text-slate-500 dark:text-slate-400">{c.lastMessage}</p>
+                      <p className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{formatDateTime(c.lastAt)}</p>
                     </div>
                     {c.unread > 0 && (
                       <span className="mt-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
@@ -135,12 +135,12 @@ export function ChatPage() {
         </div>
 
         {/* Hilo seleccionado */}
-        <div className="flex h-[34rem] animate-fade-in-up flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+        <div className="flex h-[34rem] animate-fade-in-up flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-card">
           {selected ? (
             <>
-              <div className="border-b border-slate-100 px-4 py-3">
-                <p className="text-sm font-semibold text-slate-800">{current?.name}</p>
-                <p className="text-xs text-slate-500">{current?.email}</p>
+              <div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{current?.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{current?.email}</p>
               </div>
               <div className="flex-1 overflow-hidden">
                 <ChatThread
@@ -157,7 +157,7 @@ export function ChatPage() {
               </div>
             </>
           ) : (
-            <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-slate-400">
+            <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-slate-400 dark:text-slate-500">
               {t('chat.selectToView')}
             </div>
           )}
