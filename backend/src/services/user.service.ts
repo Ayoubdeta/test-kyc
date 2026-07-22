@@ -188,6 +188,11 @@ export const userService = {
     await userRepository.updateLanguage(userId, language);
   },
 
+  /** Guarda la preferencia de tema del usuario autenticado. */
+  async setTheme(userId: string, theme: string): Promise<void> {
+    await userRepository.updateTheme(userId, theme);
+  },
+
   /** El admin fija una contraseña nueva y revoca las sesiones del usuario. */
   async resetPassword(targetUserId: string, newPassword: string): Promise<void> {
     const target = await userRepository.findById(targetUserId);

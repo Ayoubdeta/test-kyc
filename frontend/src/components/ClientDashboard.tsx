@@ -91,7 +91,7 @@ function StatCard({ label, value, icon, accent, ring, to, delay }: StatCardProps
     <Link
       to={to}
       style={{ animationDelay: `${delay}ms` }}
-      className="group animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-4 shadow-card transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-elevated"
+      className="group animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-card transition duration-200 hover:-translate-y-1 hover:border-brand-200 dark:hover:border-brand-500/30 hover:shadow-elevated"
     >
       <div className="flex items-center justify-between">
         <span
@@ -101,7 +101,7 @@ function StatCard({ label, value, icon, accent, ring, to, delay }: StatCardProps
         </span>
         <span className={`text-3xl font-bold tabular-nums ${accent}`}>{shown}</span>
       </div>
-      <p className="mt-2 text-sm font-medium text-slate-600">{label}</p>
+      <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">{label}</p>
     </Link>
   );
 }
@@ -123,7 +123,7 @@ function ActionCard({
   return (
     <Link
       to={to}
-      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition duration-200 hover:-translate-y-1 hover:shadow-elevated"
+      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-card transition duration-200 hover:-translate-y-1 hover:shadow-elevated"
     >
       <span
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm transition group-hover:scale-110 ${gradient}`}
@@ -131,8 +131,8 @@ function ActionCard({
         {icon}
       </span>
       <div className="min-w-0">
-        <h3 className="font-semibold text-slate-800">{title}</h3>
-        <p className="mt-0.5 text-sm text-slate-500">{description}</p>
+        <h3 className="font-semibold text-slate-800 dark:text-slate-100">{title}</h3>
+        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{description}</p>
       </div>
       <span
         className="ms-auto text-brand-500 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100"
@@ -146,9 +146,9 @@ function ActionCard({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-slate-100 py-2.5 last:border-0">
-      <dt className="text-sm text-slate-500">{label}</dt>
-      <dd className="truncate text-sm font-medium text-slate-800">{value}</dd>
+    <div className="flex items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 py-2.5 last:border-0">
+      <dt className="text-sm text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{value}</dd>
     </div>
   );
 }
@@ -235,8 +235,8 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           label={t('dashboard.statApproved')}
           value={approved}
           icon={<CheckCircleIcon className="h-5 w-5" />}
-          accent="text-green-600"
-          ring="bg-green-50"
+          accent="text-green-600 dark:text-green-400"
+          ring="bg-green-50 dark:bg-green-500/10"
           to="/history?estado=aprobado"
           delay={0}
         />
@@ -244,8 +244,8 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           label={t('dashboard.statInReview')}
           value={inReview}
           icon={<SearchIcon className="h-5 w-5" />}
-          accent="text-blue-600"
-          ring="bg-blue-50"
+          accent="text-blue-600 dark:text-blue-400"
+          ring="bg-blue-50 dark:bg-blue-500/10"
           to="/history?estado=revisado"
           delay={70}
         />
@@ -253,8 +253,8 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           label={t('dashboard.statPendingApproval')}
           value={pendingApproval}
           icon={<InboxIcon className="h-5 w-5" />}
-          accent="text-indigo-600"
-          ring="bg-indigo-50"
+          accent="text-indigo-600 dark:text-indigo-400"
+          ring="bg-indigo-50 dark:bg-indigo-500/10"
           to="/history?estado=revisado"
           delay={140}
         />
@@ -262,8 +262,8 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           label={t('dashboard.statRejected')}
           value={rejected}
           icon={<AlertTriangleIcon className="h-5 w-5" />}
-          accent="text-red-600"
-          ring="bg-red-50"
+          accent="text-red-600 dark:text-red-400"
+          ring="bg-red-50 dark:bg-red-500/10"
           to="/history?estado=rechazado"
           delay={210}
         />
@@ -293,11 +293,11 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
       {/* ─── Cuenta y perfil ─── */}
       <div className="grid gap-4 md:grid-cols-2">
         <section
-          className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card"
+          className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-card"
           style={{ animationDelay: '80ms' }}
         >
-          <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800">
-            <UserIcon className="h-5 w-5 text-slate-400" /> {t('dashboard.accountTitle')}
+          <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800 dark:text-slate-100">
+            <UserIcon className="h-5 w-5 text-slate-400 dark:text-slate-500" /> {t('dashboard.accountTitle')}
           </h2>
           <dl>
             <InfoRow label={t('dashboard.username')} value={user.username} />
@@ -306,11 +306,11 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           </dl>
         </section>
         <section
-          className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-6 shadow-card"
+          className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-card"
           style={{ animationDelay: '160ms' }}
         >
-          <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800">
-            <IdCardIcon className="h-5 w-5 text-slate-400" /> {t('dashboard.profileTitle')}
+          <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-800 dark:text-slate-100">
+            <IdCardIcon className="h-5 w-5 text-slate-400 dark:text-slate-500" /> {t('dashboard.profileTitle')}
           </h2>
           <dl>
             <InfoRow label={t('dashboard.fullName')} value={displayValue(profile.fullName)} />
@@ -319,7 +319,7 @@ export function ClientDashboard({ me }: { me: MeResponse }) {
           </dl>
           <Link
             to="/settings"
-            className="mt-3 inline-flex text-sm font-medium text-brand-600 transition hover:text-brand-700"
+            className="mt-3 inline-flex text-sm font-medium text-brand-600 dark:text-brand-400 transition hover:text-brand-700 dark:hover:text-brand-400"
           >
             {t('dashboard.editProfile')}
           </Link>

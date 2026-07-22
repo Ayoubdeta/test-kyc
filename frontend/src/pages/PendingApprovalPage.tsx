@@ -18,8 +18,8 @@ export function PendingApprovalPage() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">{t('review.approvalsTitle')}</h1>
-        <p className="text-sm text-slate-500">{t('review.approvalsSubtitle')}</p>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{t('review.approvalsTitle')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('review.approvalsSubtitle')}</p>
       </div>
 
       <DocumentReviewList

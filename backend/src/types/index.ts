@@ -11,6 +11,7 @@ import type {
   NotificationType,
   Role,
   StoredDocumentStatus,
+  Theme,
 } from '../config/constants';
 
 export interface UserRow {
@@ -43,6 +44,7 @@ export interface ProfileRow {
   bio: string | null;
   avatar_url: string | null;
   language: string | null;
+  theme: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -255,6 +257,7 @@ export interface PublicProfile {
   bio: string | null;
   avatarUrl: string | null;
   language: Language;
+  theme: Theme;
 }
 
 /** Respuesta combinada usuario + perfil para el dashboard. */

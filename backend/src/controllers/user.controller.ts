@@ -11,6 +11,7 @@ import type {
   CreateStaffInput,
   LanguageInput,
   ResetPasswordInput,
+  ThemeInput,
 } from '../validators/user.validators';
 
 export const userController = {
@@ -42,6 +43,16 @@ export const userController = {
     const { language } = req.body as LanguageInput;
     await userService.setLanguage(req.user.sub, language);
     res.status(200).json({ language });
+  },
+
+  /** Guarda la preferencia de tema del usuario autenticado. */
+  async setTheme(req: Request, res: Response): Promise<void> {
+    if (!req.user) {
+      throw AppError.unauthorized('No autenticado');
+    }
+    const { theme } = req.body as ThemeInput;
+    await userService.setTheme(req.user.sub, theme);
+    res.status(200).json({ theme });
   },
 
   /** Lista de usuarios (solo admin). */

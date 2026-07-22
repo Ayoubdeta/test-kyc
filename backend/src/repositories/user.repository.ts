@@ -326,6 +326,11 @@ export const userRepository = {
     await query(`UPDATE profiles SET language = $2 WHERE user_id = $1`, [userId, language]);
   },
 
+  /** Guarda la preferencia de tema (claro/oscuro/automático) del usuario. */
+  async updateTheme(userId: string, theme: string): Promise<void> {
+    await query(`UPDATE profiles SET theme = $2 WHERE user_id = $1`, [userId, theme]);
+  },
+
   async deleteById(id: string): Promise<void> {
     await query(`DELETE FROM users WHERE id = $1`, [id]);
   },

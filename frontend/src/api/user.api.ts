@@ -31,4 +31,9 @@ export const userApi = {
   async setLanguage(language: string): Promise<void> {
     await api.patch('/users/me/language', { language });
   },
+
+  /** Guarda la preferencia de tema (claro/oscuro/automático) del usuario. */
+  async setTheme(theme: string): Promise<void> {
+    await api.patch('/users/me/theme', { theme });
+  },
 };

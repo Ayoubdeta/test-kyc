@@ -18,8 +18,8 @@ function ErrorFallback() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
       <AlertTriangleIcon className="h-12 w-12 text-red-500" />
-      <h1 className="text-lg font-bold text-slate-900">{t('common.appError')}</h1>
-      <p className="max-w-sm text-sm text-slate-500">{t('common.appErrorHint')}</p>
+      <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('common.appError')}</h1>
+      <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">{t('common.appErrorHint')}</p>
       <Button variant="primary" onClick={() => window.location.reload()}>
         <RefreshIcon className="h-4 w-4" />
         {t('common.reload')}

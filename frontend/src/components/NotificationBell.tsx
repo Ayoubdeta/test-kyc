@@ -98,21 +98,21 @@ export function NotificationBell() {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         {count > 0 && (
-          <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-brand-700 ring-2 ring-brand-600">
+          <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-white dark:bg-slate-900 px-1 text-[10px] font-bold text-brand-700 dark:text-brand-400 ring-2 ring-brand-600">
             {count > 9 ? '9+' : count}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute end-0 z-40 mt-2 w-80 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-elevated">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <span className="text-sm font-semibold text-slate-800">{t('notif.title')}</span>
+        <div className="absolute end-0 z-40 mt-2 w-80 origin-top-right animate-scale-in overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-elevated">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-3">
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{t('notif.title')}</span>
             {notifications.some((n) => !n.read) && (
               <button
                 type="button"
                 onClick={() => markAll.mutate()}
-                className="text-xs font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50"
+                className="text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-400 disabled:opacity-50"
                 disabled={markAll.isPending}
               >
                 {t('notif.markRead')}
@@ -122,13 +122,13 @@ export function NotificationBell() {
 
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-6 text-center text-sm text-slate-500">{t('common.loading')}</p>
+              <p className="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
             ) : preview.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-slate-500">
+              <p className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                 {t('notif.empty')}
               </p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {preview.map((n) => (
                   <li
                     key={n.id}
@@ -141,12 +141,12 @@ export function NotificationBell() {
                     >
                       <NotificationIcon
                         type={n.type}
-                        className="mt-0.5 h-5 w-5 shrink-0 text-slate-500"
+                        className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 dark:text-slate-400"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-800">{n.title}</p>
-                        <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{n.message}</p>
-                        <p className="mt-1 text-[11px] text-slate-400">
+                        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{n.title}</p>
+                        <p className="mt-0.5 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">{n.message}</p>
+                        <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
                           {formatDateTime(n.createdAt)}
                         </p>
                       </div>
@@ -154,7 +154,7 @@ export function NotificationBell() {
                     <button
                       type="button"
                       onClick={() => remove.mutate(n.id)}
-                      className="shrink-0 self-start rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-red-600"
+                      className="shrink-0 self-start rounded-md p-1 text-slate-400 dark:text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-red-600 dark:hover:text-red-400"
                       aria-label={t('notif.deleteAria')}
                     >
                       <svg
@@ -180,7 +180,7 @@ export function NotificationBell() {
           <Link
             to="/notifications"
             onClick={() => setOpen(false)}
-            className="block border-t border-slate-100 px-4 py-2.5 text-center text-sm font-medium text-brand-600 transition hover:bg-slate-50"
+            className="block border-t border-slate-100 dark:border-slate-800 px-4 py-2.5 text-center text-sm font-medium text-brand-600 dark:text-brand-400 transition hover:bg-slate-50 dark:hover:bg-slate-800"
           >
             {t('notif.viewAll')}
           </Link>

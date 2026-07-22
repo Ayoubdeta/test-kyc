@@ -206,16 +206,16 @@ export function DocumentReviewList({
   }
 
   if (isLoading) {
-    return <p className="text-sm text-slate-500">{t('common.loading')}</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>;
   }
 
   if (groups.length === 0) {
     return (
-      <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
+      <div className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-10 text-center shadow-card">
         <p className="text-3xl" aria-hidden="true">
           🗂️
         </p>
-        <p className="mt-2 text-sm text-slate-500">{emptyText ?? t('list.empty')}</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{emptyText ?? t('list.empty')}</p>
       </div>
     );
   }
@@ -234,38 +234,38 @@ export function DocumentReviewList({
           return (
             <div
               key={g.ownerId}
-              className="animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card"
+              className="animate-fade-in-up overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-card"
             >
               <button
                 type="button"
                 onClick={() => toggle(g.ownerId)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start transition hover:bg-slate-50"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start transition hover:bg-slate-50 dark:hover:bg-slate-800"
                 aria-expanded={isOpen}
               >
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-800">{g.name}</p>
-                  <p className="truncate text-xs text-slate-500">{g.email}</p>
+                  <p className="truncate font-semibold text-slate-800 dark:text-slate-100">{g.name}</p>
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">{g.email}</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   {g.pending > 0 && (
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">
+                    <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 font-semibold text-slate-600 dark:text-slate-300">
                       {t('list.pending', { n: g.pending })}
                     </span>
                   )}
                   {g.inReview > 0 && (
-                    <span className="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">
+                    <span className="rounded-full bg-blue-100 dark:bg-blue-500/20 px-2 py-0.5 font-semibold text-blue-700 dark:text-blue-400">
                       {t('list.inReviewCount', { n: g.inReview })}
                     </span>
                   )}
                   {g.pendingApproval > 0 && (
-                    <span className="rounded-full bg-indigo-100 px-2 py-0.5 font-semibold text-indigo-700">
+                    <span className="rounded-full bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 font-semibold text-indigo-700 dark:text-indigo-400">
                       {t('list.pendingApprovalCount', { n: g.pendingApproval })}
                     </span>
                   )}
-                  <span className="rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
+                  <span className="rounded-full bg-green-100 dark:bg-green-500/20 px-2 py-0.5 font-semibold text-green-700 dark:text-green-400">
                     {t('list.approvedCount', { n: g.approved })}
                   </span>
-                  <span className="text-slate-400">{t('list.docsCount', { n: g.docs.length })}</span>
+                  <span className="text-slate-400 dark:text-slate-500">{t('list.docsCount', { n: g.docs.length })}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -274,7 +274,7 @@ export function DocumentReviewList({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`h-4 w-4 text-slate-400 dark:text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     aria-hidden="true"
                   >
                     <path d="m6 9 6 6 6-6" />
@@ -283,24 +283,24 @@ export function DocumentReviewList({
               </button>
 
               {isOpen && (
-                <ul className="divide-y divide-slate-100 border-t border-slate-100">
+                <ul className="divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800">
                   {g.docs.map((doc) => (
                     <li key={doc.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-800">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
                           {docTypeLabel(t, doc.docType)}
                         </p>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                           {doc.originalName} · {formatBytes(doc.sizeBytes)} ·{' '}
                           {formatDateTime(doc.uploadedAt)}
                         </p>
                         {doc.status === 'aprobado' && doc.expiresAt && (
-                          <p className="text-xs text-green-700">
+                          <p className="text-xs text-green-700 dark:text-green-400">
                             {t('docs.validUntil', { date: formatDate(doc.expiresAt) })}
                           </p>
                         )}
                         {doc.status === 'caducado' && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-amber-700 dark:text-amber-400">
                             {t('list.expiredOn', { date: formatDate(doc.expiresAt) })}
                           </p>
                         )}
@@ -308,7 +308,7 @@ export function DocumentReviewList({
                           doc.status === 'en_revision' ||
                           doc.status === 'pendiente_aprobacion') &&
                           doc.reviewComment && (
-                            <p className="text-xs text-slate-500">“{doc.reviewComment}”</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">“{doc.reviewComment}”</p>
                           )}
                       </div>
                       <StatusBadge status={doc.status} />
@@ -358,12 +358,12 @@ export function DocumentReviewList({
         onClose={() => setReviewTarget(null)}
       >
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {docTypeLabel(t, reviewTarget?.doc.docType ?? null)} ·{' '}
             {reviewTarget?.doc.owner?.email}
           </p>
 
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {reviewTarget?.action === 'cancelar'
               ? t('list.cancelDesc')
               : t('list.sendApprovalDesc')}
@@ -371,12 +371,12 @@ export function DocumentReviewList({
 
           {reviewTarget?.action === 'enviar_aprobacion' && (
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="reviewValidity" className="text-sm font-medium text-slate-700">
+              <label htmlFor="reviewValidity" className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 {t('list.validity')}
               </label>
               <select
                 id="reviewValidity"
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
                 value={reviewValidityMonths}
                 onChange={(e) => setReviewValidityMonths(Number(e.target.value))}
               >
@@ -422,19 +422,19 @@ export function DocumentReviewList({
         onClose={() => setDecisionTarget(null)}
       >
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {docTypeLabel(t, decisionTarget?.doc.docType ?? null)} ·{' '}
             {decisionTarget?.doc.owner?.email}
           </p>
 
           {decisionTarget?.status === 'aprobado' && (
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="validity" className="text-sm font-medium text-slate-700">
+              <label htmlFor="validity" className="text-sm font-medium text-slate-700 dark:text-slate-200">
                 {t('list.validity')}
               </label>
               <select
                 id="validity"
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
                 value={validityMonths}
                 onChange={(e) => setValidityMonths(Number(e.target.value))}
               >

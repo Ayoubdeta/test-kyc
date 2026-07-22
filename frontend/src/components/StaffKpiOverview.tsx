@@ -40,7 +40,7 @@ export function StaffKpiOverview() {
 
   if (isLoading || !data) {
     return (
-      <div className="animate-fade-in rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-card">
+      <div className="animate-fade-in rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-sm text-slate-500 dark:text-slate-400 shadow-card">
         {tr('kpi.loading')}
       </div>
     );
@@ -54,12 +54,12 @@ export function StaffKpiOverview() {
   const approvalTo = isDireccion ? '/approvals' : '/review';
 
   const kpis = [
-    { label: tr('kpi.sentIn', { year: data.year }), value: t.enviadosEsteAno, accent: 'text-brand-600', iconBg: 'bg-brand-50', icon: <SendIcon className={ICON_CLASS} />, to: '/kpis' },
-    { label: tr('kpi.toReview'), value: t.pendientes, accent: 'text-slate-600', iconBg: 'bg-slate-100', icon: <ClockIcon className={ICON_CLASS} />, to: porRevisarTo },
-    { label: tr('kpi.inReview'), value: t.enRevision, accent: 'text-blue-600', iconBg: 'bg-blue-50', icon: <SearchIcon className={ICON_CLASS} />, to: enRevisionTo },
-    { label: tr('kpi.pendingApproval'), value: t.pendienteAprobacion, accent: 'text-indigo-600', iconBg: 'bg-indigo-50', icon: <InboxIcon className={ICON_CLASS} />, to: approvalTo },
-    { label: tr('kpi.approved'), value: t.aprobados, accent: 'text-green-600', iconBg: 'bg-green-50', icon: <CheckCircleIcon className={ICON_CLASS} />, to: '/kpis' },
-    { label: tr('kpi.expired'), value: t.caducados, accent: 'text-amber-600', iconBg: 'bg-amber-50', icon: <AlertTriangleIcon className={ICON_CLASS} />, to: '/kpis' },
+    { label: tr('kpi.sentIn', { year: data.year }), value: t.enviadosEsteAno, accent: 'text-brand-600 dark:text-brand-400', iconBg: 'bg-brand-50 dark:bg-brand-500/10', icon: <SendIcon className={ICON_CLASS} />, to: '/kpis' },
+    { label: tr('kpi.toReview'), value: t.pendientes, accent: 'text-slate-600 dark:text-slate-300', iconBg: 'bg-slate-100 dark:bg-slate-800', icon: <ClockIcon className={ICON_CLASS} />, to: porRevisarTo },
+    { label: tr('kpi.inReview'), value: t.enRevision, accent: 'text-blue-600 dark:text-blue-400', iconBg: 'bg-blue-50 dark:bg-blue-500/10', icon: <SearchIcon className={ICON_CLASS} />, to: enRevisionTo },
+    { label: tr('kpi.pendingApproval'), value: t.pendienteAprobacion, accent: 'text-indigo-600 dark:text-indigo-400', iconBg: 'bg-indigo-50 dark:bg-indigo-500/10', icon: <InboxIcon className={ICON_CLASS} />, to: approvalTo },
+    { label: tr('kpi.approved'), value: t.aprobados, accent: 'text-green-600 dark:text-green-400', iconBg: 'bg-green-50 dark:bg-green-500/10', icon: <CheckCircleIcon className={ICON_CLASS} />, to: '/kpis' },
+    { label: tr('kpi.expired'), value: t.caducados, accent: 'text-amber-600 dark:text-amber-400', iconBg: 'bg-amber-50 dark:bg-amber-500/10', icon: <AlertTriangleIcon className={ICON_CLASS} />, to: '/kpis' },
   ];
 
   const donut = [
@@ -74,8 +74,8 @@ export function StaffKpiOverview() {
   return (
     <section className="mb-6">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-800">{tr('kpi.title')}</h2>
-        <Link to="/kpis" className="text-sm font-medium text-brand-600 hover:text-brand-700">
+        <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">{tr('kpi.title')}</h2>
+        <Link to="/kpis" className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-400">
           {tr('kpi.viewAll')}
         </Link>
       </div>
@@ -95,12 +95,12 @@ export function StaffKpiOverview() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">{tr('kpi.byStatus')}</h3>
+        <div className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-card">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">{tr('kpi.byStatus')}</h3>
           <DonutChart segments={donut} />
         </div>
-        <div className="animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 className="mb-3 text-sm font-semibold text-slate-700">
+        <div className="animate-fade-in-up rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-card">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
             {tr('kpi.byMonth', { year: data.year })}
           </h3>
           {/* En pantallas anchas: barras verticales por mes. */}

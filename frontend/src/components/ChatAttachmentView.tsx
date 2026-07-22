@@ -66,7 +66,7 @@ export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
         {imageUrl ? (
           <img src={imageUrl} alt={attachment.name} className="max-h-52 max-w-full object-cover" />
         ) : (
-          <div className="flex h-24 w-40 items-center justify-center bg-black/5 text-xs text-slate-400">
+          <div className="flex h-24 w-40 items-center justify-center bg-black/5 text-xs text-slate-400 dark:text-slate-500">
             {t('chat.loadingImage')}
           </div>
         )}
@@ -82,13 +82,13 @@ export function ChatAttachmentView({ messageId, attachment, mine }: Props) {
       className={`mt-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-start text-xs transition ${
         mine
           ? 'border-white/30 bg-white/10 hover:bg-white/20'
-          : 'border-slate-200 bg-white hover:bg-slate-50'
+          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
       }`}
     >
-      <FileTextIcon className={`h-5 w-5 shrink-0 ${mine ? 'text-white' : 'text-brand-600'}`} />
+      <FileTextIcon className={`h-5 w-5 shrink-0 ${mine ? 'text-white' : 'text-brand-600 dark:text-brand-400'}`} />
       <span className="min-w-0">
         <span className="block max-w-[12rem] truncate font-medium">{attachment.name}</span>
-        <span className={mine ? 'text-white/70' : 'text-slate-400'}>
+        <span className={mine ? 'text-white/70' : 'text-slate-400 dark:text-slate-500'}>
           {downloading ? t('chat.downloading') : formatBytes(attachment.size)}
         </span>
       </span>

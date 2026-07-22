@@ -206,3 +206,9 @@ export const RATE_LIMIT = {
 export const SUPPORTED_LANGUAGES = ['es', 'ca', 'en', 'de', 'fr', 'ar', 'zh'] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = 'es';
+
+// Preferencia de tema por usuario. 'system' sigue el tema del sistema operativo
+// (prefers-color-scheme). Se guarda en profiles.theme. Por defecto 'system'.
+export const SUPPORTED_THEMES = ['light', 'dark', 'system'] as const;
+export type Theme = (typeof SUPPORTED_THEMES)[number];
+export const DEFAULT_THEME: Theme = 'system';

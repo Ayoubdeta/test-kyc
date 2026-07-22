@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '../api/client';
 import { userApi, type UpdateProfilePayload } from '../api/user.api';
 import { Avatar } from '../components/Avatar';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { ThemeSwitcher } from '../components/ThemeSwitcher';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { TextArea } from '../components/ui/TextArea';
@@ -115,16 +116,23 @@ export function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-1 text-xl font-bold text-slate-900">{t('settings.title')}</h1>
-        <p className="mb-6 text-sm text-slate-500">{t('settings.subtitle')}</p>
+        <h1 className="mb-1 text-xl font-bold text-slate-900 dark:text-slate-50">{t('settings.title')}</h1>
+        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
 
         {/* Idioma de la interfaz (se guarda en la cuenta) */}
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-base font-semibold text-slate-800">
+        <section className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <h2 className="mb-1 text-base font-semibold text-slate-800 dark:text-slate-100">
             {t('settings.languageTitle')}
           </h2>
-          <p className="mb-4 text-sm text-slate-500">{t('settings.languageHint')}</p>
+          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">{t('settings.languageHint')}</p>
           <LanguageSwitcher />
+        </section>
+
+        {/* Tema de la interfaz (se guarda en la cuenta) */}
+        <section className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <h2 className="mb-1 text-base font-semibold text-slate-800 dark:text-slate-100">{t('theme.title')}</h2>
+          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">{t('theme.hint')}</p>
+          <ThemeSwitcher />
         </section>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
@@ -132,8 +140,8 @@ export function SettingsPage() {
           {success && <Alert variant="info">{t('settings.saved')}</Alert>}
 
           {/* Foto de perfil */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-base font-semibold text-slate-800">
+          <section className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <h2 className="mb-4 text-base font-semibold text-slate-800 dark:text-slate-100">
               {t('settings.photoTitle')}
             </h2>
             <div className="flex items-center gap-5">
@@ -153,8 +161,8 @@ export function SettingsPage() {
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-slate-500">{t('settings.photoHint')}</p>
-                {avatarError && <p className="text-xs text-red-600">{avatarError}</p>}
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.photoHint')}</p>
+                {avatarError && <p className="text-xs text-red-600 dark:text-red-400">{avatarError}</p>}
               </div>
               <input
                 ref={fileInputRef}
@@ -167,8 +175,8 @@ export function SettingsPage() {
           </section>
 
           {/* Datos personales */}
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-slate-800">
+          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">
               {t('settings.personalTitle')}
             </h2>
 

@@ -64,23 +64,23 @@ export function CreateStaffModal({ onClose }: { onClose: () => void }) {
       {result ? (
         // Éxito: mostramos el enlace de activación para compartirlo.
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">
+          <div className="rounded-xl bg-green-50 dark:bg-green-500/10 px-4 py-3 text-sm text-green-800 dark:text-green-300">
             {t('cs.createdLead')} {t('cc.createdShare')}
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-slate-500">{t('cc.activationLink')}</label>
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('cc.activationLink')}</label>
             <div className="flex gap-2">
               <input
                 readOnly
                 value={activationLink}
                 onFocus={(e) => e.target.select()}
-                className="flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none"
+                className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs text-slate-700 dark:text-slate-200 outline-none"
               />
               <Button variant="ghost" onClick={copyLink}>
                 {copied ? t('cc.copied') : t('cc.copy')}
               </Button>
             </div>
-            <p className="text-xs text-slate-400">{t('cc.linkExpires')}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{t('cc.linkExpires')}</p>
           </div>
           <div className="flex justify-end">
             <Button onClick={onClose}>{t('cc.done')}</Button>
@@ -105,14 +105,14 @@ export function CreateStaffModal({ onClose }: { onClose: () => void }) {
           />
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="staffRole" className="text-sm font-medium text-slate-700">
+            <label htmlFor="staffRole" className="text-sm font-medium text-slate-700 dark:text-slate-200">
               {t('cs.role')}
             </label>
             <select
               id="staffRole"
               value={values.role}
               onChange={set('role')}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
               {STAFF_ROLE_VALUES.map((r) => (
                 <option key={r} value={r}>

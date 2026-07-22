@@ -12,7 +12,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={areaId} className="text-sm font-medium text-slate-700">
+        <label htmlFor={areaId} className="text-sm font-medium text-slate-700 dark:text-slate-200">
           {label}
         </label>
         <textarea
@@ -23,11 +23,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           aria-describedby={errorId}
           className={`resize-y rounded-lg border px-3 py-2.5 text-sm outline-none transition
             focus:ring-2 focus:ring-brand-500 focus:border-brand-500
-            ${error ? 'border-red-400 bg-red-50' : 'border-slate-300 bg-white'} ${className}`}
+            ${error ? 'border-red-400 bg-red-50 dark:bg-red-500/10' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'} ${className}`}
           {...rest}
         />
         {error && (
-          <p id={errorId} className="text-xs text-red-600">
+          <p id={errorId} className="text-xs text-red-600 dark:text-red-400">
             {error}
           </p>
         )}

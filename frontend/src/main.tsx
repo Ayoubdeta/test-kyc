@@ -7,6 +7,7 @@ import { CookieConsent } from './components/CookieConsent';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AuthProvider } from './context/AuthContext';
 import { I18nProvider } from './i18n';
+import { ThemeProvider } from './theme';
 import './index.css';
 
 // Cliente de React Query: gestiona el estado del servidor (caché, reintentos).
@@ -33,14 +34,16 @@ createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <I18nProvider>
-            <ErrorBoundary>
-              <App />
-            </ErrorBoundary>
-            {/* Aviso de cookies (parte inferior); fuera del ErrorBoundary de la
-                app para que se muestre aunque una página falle al renderizar. */}
-            <CookieConsent />
-          </I18nProvider>
+          <ThemeProvider>
+            <I18nProvider>
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
+              {/* Aviso de cookies (parte inferior); fuera del ErrorBoundary de la
+                  app para que se muestre aunque una página falle al renderizar. */}
+              <CookieConsent />
+            </I18nProvider>
+          </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
